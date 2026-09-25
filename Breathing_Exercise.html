@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PranaVeda – Sacred Pranayama & Breathwork Studio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% 0%, #edf7f9 0%, #e3f0f4 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(210, 230, 235, 0.7);
+            --text-primary: #192a30;
+            --text-secondary: #5f757d;
+            --text-muted: #8ca2aa;
+            
+            --accent-cyan: #26a5b8;
+            --accent-glow: rgba(38, 165, 184, 0.35);
+            --accent-gold: #e5a93c;
+            --accent-gold-glow: rgba(229, 169, 60, 0.35);
+            --accent-purple: #8b6bc7;
+            --accent-purple-glow: rgba(139, 107, 199, 0.35);
+            --accent-rose: #d6647f;
+            
+            --phase-color: var(--accent-cyan);
+            --phase-glow: var(--accent-glow);
+            
+            --card-shadow: 0 10px 30px -5px rgba(27, 65, 75, 0.07), 0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+            --btn-shadow: 0 4px 14px rgba(38, 165, 184, 0.3);
+            --danger: #e05d5d;
+            --success: #2ea879;
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+        }
+
+        body.dark {
+            --bg-gradient: radial-gradient(circle at 50% -10%, #172428 0%, #0c1214 100%);
+            --card-bg: rgba(20, 31, 35, 0.8);
+            --card-border: rgba(46, 68, 76, 0.6);
+            --text-primary: #eaf3f5;
+            --text-secondary: #9cb5bd;
+            --text-muted: #5e7b85;
+            
+            --card-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05) inset;
+            --btn-shadow: 0 4px 18px rgba(38, 165, 184, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px 16px;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient subtle aura in background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
+            transition: background 0.8s ease;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 2px 8px var(--accent-glow));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        /* TOP ACTION BAR */
+        .top-nav-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* GLASS CARDS */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 22px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* CONTROLS GRID */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-secondary);
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Pranayama Mudra / Hint Alert */
+        .technique-info-banner {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(38, 165, 184, 0.08);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .technique-info-banner b {
+            color: var(--text-primary);
+        }
+
+        /* Custom Pattern Grid */
+        .custom-pattern {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--card-border);
+        }
+
+        .custom-pattern.show {
+            display: grid;
+        }
+
+        .custom-pattern input {
+            text-align: center;
+        }
+
+        /* =========================
+           BREATHING CANVAS / STAGE
+           ========================= */
+        .breath-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+            position: relative;
+        }
+
+        /* Nostril Indicator for Nadi Shodhana / Anulom Vilom */
+        .nostril-guide {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding: 8px 18px;
+            background: rgba(38, 165, 184, 0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .nostril-guide.active {
+            display: inline-flex;
+        }
+
+        .nostril-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .nostril-pill.active {
+            opacity: 1;
+            background: var(--accent-cyan);
+            color: white;
+            box-shadow: 0 2px 10px var(--accent-glow);
+            transform: scale(1.05);
+        }
+
+        /* 5-Stage Metta Bhavana Visual Guide */
+        .metta-guide {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 7px 14px;
+            background: rgba(214, 100, 127, 0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .metta-guide.active {
+            display: inline-flex;
+        }
+
+        .metta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            opacity: 0.45;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+
+        .metta-pill.active {
+            opacity: 1;
+            background: linear-gradient(135deg, var(--accent-rose), #b83d5a);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 10px rgba(214, 100, 127, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* 4-Stage Guided Visualization Guide */
+        .vis-guide {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 7px 14px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .vis-guide.active {
+            display: inline-flex;
+        }
+
+        .vis-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            opacity: 0.45;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+
+        .vis-pill.active {
+            opacity: 1;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+            transform: scale(1.05);
+        }
+
+        .vis-icon {
+            font-size: 34px;
+            line-height: 1;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 0 14px var(--phase-color));
+            animation: vis-gentle-pulse 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes vis-gentle-pulse {
+            0% { transform: scale(0.95); opacity: 0.85; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* 7-Chakra Alignment Visual Guide */
+        .chakra-guide {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 16px;
+            padding: 7px 12px;
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .chakra-guide.active {
+            display: inline-flex;
+        }
+
+        .chakra-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            opacity: 0.45;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+
+        .chakra-pill.active {
+            opacity: 1;
+            color: white;
+            border-color: transparent;
+            transform: scale(1.08);
+            box-shadow: 0 2px 12px var(--chakra-glow, rgba(168, 85, 247, 0.5));
+        }
+
+        .chakra-pill.active.c1 { background: linear-gradient(135deg, #dc2626, #991b1b); --chakra-glow: rgba(220, 38, 38, 0.6); }
+        .chakra-pill.active.c2 { background: linear-gradient(135deg, #ea580c, #c2410c); --chakra-glow: rgba(234, 88, 12, 0.6); }
+        .chakra-pill.active.c3 { background: linear-gradient(135deg, #eab308, #ca8a04); --chakra-glow: rgba(234, 179, 8, 0.6); color: #000; }
+        .chakra-pill.active.c4 { background: linear-gradient(135deg, #10b981, #047857); --chakra-glow: rgba(16, 185, 129, 0.6); }
+        .chakra-pill.active.c5 { background: linear-gradient(135deg, #06b6d4, #0e7490); --chakra-glow: rgba(6, 182, 212, 0.6); }
+        .chakra-pill.active.c6 { background: linear-gradient(135deg, #6366f1, #4338ca); --chakra-glow: rgba(99, 102, 241, 0.6); }
+        .chakra-pill.active.c7 { background: linear-gradient(135deg, #a855f7, #7e22ce); --chakra-glow: rgba(168, 85, 247, 0.6); }
+
+        /* Sphere Halo Wrapper */
+        .sphere-outer-wrapper {
+            width: 380px;
+            height: 380px;
+            max-width: 85vw;
+            max-height: 85vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        /* Animated Pulsing Halo Ring */
+        .halo-ring {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            border: 2px dashed var(--phase-color);
+            opacity: 0.35;
+            animation: rotateHalo 30s linear infinite;
+            pointer-events: none;
+            transition: border-color 0.8s ease;
+        }
+
+        @keyframes rotateHalo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Central Breathing Sphere */
+        .breath-sphere {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--phase-color) 70%, #0d3840 120%);
+            box-shadow: 0 0 45px var(--phase-glow), 0 0 90px rgba(38, 165, 184, 0.15), inset 0 -10px 25px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transform: scale(1);
+            transform-origin: center center;
+            will-change: transform;
+            backface-visibility: hidden;
+            user-select: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .sanskrit-title {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2px;
+        }
+
+        .phase-name {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .phase-seconds {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .cycle-badge {
+            font-size: 11px;
+            margin-top: 6px;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Session Progress and Time */
+        .session-stats-bar {
+            width: 100%;
+            max-width: 480px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .time-display-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .time-badge {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 8px;
+            background: var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+            border-radius: 20px;
+            transition: width 0.3s linear;
+        }
+
+        /* BUTTONS & CONTROLS */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            border: none;
+            padding: 13px 26px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, #1c8899 100%);
+            color: white;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+            filter: brightness(1.08);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(38, 165, 184, 0.1);
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(224, 93, 93, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(224, 93, 93, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-mind {
+            margin-top: 14px;
+            background: rgba(139, 107, 199, 0.12);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 107, 199, 0.3);
+            font-size: 13px;
+            padding: 9px 18px;
+            border-radius: 20px;
+        }
+
+        .btn-mind:hover {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        /* SOUNDSCAPE SELECTOR */
+        .ambient-audio-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .audio-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        /* =========================
+           DASHBOARD STATS & ACHIEVEMENTS
+           ========================= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px 12px;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .stat-box:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-desc {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ACHIEVEMENTS / BADGES */
+        .badges-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 6px 2px 12px 2px;
+            margin-top: 14px;
+        }
+
+        .achievement-badge {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+        }
+
+        .achievement-badge.unlocked {
+            background: rgba(229, 169, 60, 0.12);
+            border-color: rgba(229, 169, 60, 0.4);
+            color: var(--text-primary);
+            box-shadow: 0 2px 10px var(--accent-gold-glow);
+        }
+
+        /* =========================
+           SESSION HISTORY (DATE-WISE GROUPING)
+           ========================= */
+        .history-groups-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .history-date-group {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .history-date-group:hover {
+            border-color: rgba(38, 165, 184, 0.35);
+        }
+
+        .date-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(38, 165, 184, 0.06);
+            border-bottom: 1px solid var(--card-border);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        body.dark .date-group-header {
+            background: rgba(38, 165, 184, 0.1);
+        }
+
+        .date-group-header:hover {
+            background: rgba(38, 165, 184, 0.12);
+        }
+
+        body.dark .date-group-header:hover {
+            background: rgba(38, 165, 184, 0.16);
+        }
+
+        .date-group-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .date-group-toggle-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.05);
+            font-size: 10px;
+            color: var(--text-secondary);
+            transition: transform 0.25s ease, background 0.2s ease;
+        }
+
+        body.dark .date-group-toggle-icon {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .history-date-group.collapsed .date-group-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .date-group-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .date-badge-today {
+            background: linear-gradient(135deg, var(--accent-cyan), #1b8a99);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .date-badge-yesterday {
+            background: linear-gradient(135deg, var(--accent-purple), #6e4ea8);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--accent-purple-glow);
+        }
+
+        .date-group-sublabel {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .date-group-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .date-group-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .date-summary-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        body.dark .date-summary-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+        }
+
+        .btn-delete-group {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete-group:hover {
+            background: rgba(224, 93, 93, 0.15);
+            color: var(--danger);
+        }
+
+        .date-group-content {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-date-group.collapsed .date-group-header {
+            border-bottom: none;
+        }
+
+        .history-date-group.collapsed .date-group-content {
+            display: none;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .session-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            min-width: 580px;
+        }
+
+        .session-table th {
+            background: rgba(38, 165, 184, 0.04);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        body.dark .session-table th {
+            background: rgba(38, 165, 184, 0.08);
+        }
+
+        .session-table td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .session-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .session-table tbody tr:hover td {
+            background: rgba(38, 165, 184, 0.04);
+        }
+
+        body.dark .session-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pill-pattern {
+            background: rgba(38, 165, 184, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(38, 165, 184, 0.25);
+        }
+
+        .pill-duration {
+            background: rgba(113, 128, 135, 0.12);
+            color: var(--text-primary);
+        }
+
+        .pill-wanders {
+            background: rgba(139, 107, 199, 0.12);
+            color: var(--accent-purple);
+        }
+
+        .rating-stars {
+            color: #f3a825;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .rating-score {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        .btn-delete-row {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete-row:hover {
+            background: rgba(224, 93, 93, 0.15);
+            color: var(--danger);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--card-border);
+        }
+
+        .empty-history-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .rating-btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 22px 0;
+        }
+
+        .rating-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rating-btn:hover, .rating-btn.active {
+            background: var(--accent-gold);
+            color: white;
+            border-color: var(--accent-gold);
+            transform: scale(1.1);
+            box-shadow: 0 4px 14px var(--accent-gold-glow);
+        }
+
+        /* Pranayama Guide Accordion */
+        .guide-item {
+            margin-bottom: 12px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .guide-title {
+            padding: 12px 16px;
+            background: rgba(38, 165, 184, 0.06);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guide-content {
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--card-border);
+            display: none;
+        }
+
+        .guide-content.show {
+            display: block;
+        }
+
+        /* ZEN IMMERSIVE FULLSCREEN */
+        body.zen-mode .card:not(.breath-card),
+        body.zen-mode header,
+        body.zen-mode .top-nav-bar,
+        body.zen-mode .ambient-audio-bar {
+            display: none !important;
+        }
+
+        body.zen-mode .container {
+            max-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        body.zen-mode .breath-card {
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .zen-exit-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        body.zen-mode .zen-exit-btn {
+            display: block;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 650px) {
+            h1 { font-size: 24px; }
+            .sphere-outer-wrapper { width: 300px; height: 300px; }
+            .halo-ring { width: 220px; height: 220px; }
+            .breath-sphere { width: 155px; height: 155px; }
+            .phase-seconds { font-size: 38px; }
+            .phase-name { font-size: 16px; }
+            .card { padding: 18px 14px; }
+            .custom-pattern { grid-template-columns: repeat(2, 1fr); }
+            .btn { padding: 11px 18px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+<button id="zenExitBtn" class="zen-exit-btn icon-btn" title="Exit Zen Mode">
+    ✕ Exit Zen Mode (Esc)
+</button>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-wrap">
+            <span class="logo-icon">🪷</span>
+            <h1>PRANAVEDA</h1>
+        </div>
+        <p class="tagline">Sacred Pranayama Breathwork & Mind Alignment</p>
+    </header>
+
+    <!-- TOP NAV BAR -->
+    <div class="top-nav-bar">
+        <a href="Asanas.html" class="icon-btn" style="text-decoration: none;" title="Open Yoga Asana Studio">
+            🧘 Yoga Asanas
+        </a>
+        <button id="guideBtn" class="icon-btn">
+            📖 Pranayama Guide
+        </button>
+        <button id="zenBtn" class="icon-btn">
+            🧘 Zen Mode
+        </button>
+        <button id="themeBtn" class="icon-btn">
+            🌙 Dark Mode
+        </button>
+        <button id="fullscreenBtn" class="icon-btn">
+            ⛶ Fullscreen
+        </button>
+    </div>
+
+    <!-- SETTINGS / CONFIG CARD -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">⚙️ Practice Settings</div>
+            <div id="techniqueBadge" class="pill pill-pattern">🌿 Vagal Relaxation</div>
+        </div>
+
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="pattern">Pranayama Technique</label>
+                <select id="pattern">
+                    <optgroup label="🌊 Core & Daily Breathwork (Default)">
+                        <option value="4-6" selected>4–6 Deep Relaxation (Default)</option>
+                        <option value="box">Sama Vritti (Box 4–4–4–4)</option>
+                        <option value="4-7-8">4–7–8 Nervous System Reset</option>
+                        <option value="5-5">5–5 Coherent Calm</option>
+                        <option value="custom">⚙️ Custom Ratio</option>
+                    </optgroup>
+                    <optgroup label="🧘 Mindfulness & Meditation">
+                        <option value="anapanasati">Anapanasati (Mindful Breath Observation)</option>
+                        <option value="metta">Metta Bhavana (Loving-Kindness Meditation)</option>
+                    </optgroup>
+                    <optgroup label="🌟 Guided Visualizations & Positive Events">
+                        <option value="vis_success">🏆 Positive Incident: Breakthrough & Victory</option>
+                        <option value="vis_goodnews">💌 Positive Incident: Joyful News & Blessings</option>
+                        <option value="vis_harmony">🌈 Positive Incident: Harmony & Connection</option>
+                        <option value="vis_sun">☀️ Golden Sunshine & Inner Light (Surya Dhyana)</option>
+                        <option value="vis_deity">🛕 Divine Sacred Presence (Ishta Devata)</option>
+                        <option value="vis_lotus">🪷 Blooming Heart Lotus (Hridaya Kamala)</option>
+                        <option value="vis_cosmos">🌌 Cosmic Starlight & Sky (Akasha Dhyana)</option>
+                        <option value="vis_ocean">🌊 Ocean of Serenity (Healing Waters)</option>
+                        <option value="vis_mountain">🏔️ Mountain of Stillness (Meru Dhyana)</option>
+                    </optgroup>
+                    <optgroup label="🌈 7-Chakra Mantra Meditation (LAM VAM RAM YAM HAM OM AUM)">
+                        <option value="chakra_all">🌈 Complete 7-Chakra Alignment (LAM to OM)</option>
+                        <option value="chakra_root">🔴 1. Root Chakra Grounding (LAM - Muladhara)</option>
+                        <option value="chakra_sacral">🟠 2. Sacral Chakra Creativity (VAM - Svadhisthana)</option>
+                        <option value="chakra_solar">🟡 3. Solar Plexus Willpower (RAM - Manipura)</option>
+                        <option value="chakra_heart">🟢 4. Heart Chakra Love & Healing (YAM - Anahata)</option>
+                        <option value="chakra_throat">🔵 5. Throat Chakra Expression (HAM - Vishuddha)</option>
+                        <option value="chakra_thirdeye">🟣 6. Third Eye Wisdom (OM - Ajna)</option>
+                        <option value="chakra_crown">👑 7. Crown Chakra Bliss & Unity (AUM - Sahasrara)</option>
+                    </optgroup>
+                    <optgroup label="✨ Traditional Pranayama">
+                        <option value="anulom">Anulom Vilom (Nadi Shodhana)</option>
+                        <option value="bhramari">Bhramari (Humming Bee Breath)</option>
+                        <option value="kapalbhati">Kapalabhati (Skull Shining Breath)</option>
+                        <option value="sheetali">Sheetali (Cooling Breath)</option>
+                        <option value="ujjayi">Ujjayi (Victorious Ocean Breath)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="duration">Practice Duration</label>
+                <select id="duration">
+                    <option value="3">3 Minutes (Quick Focus)</option>
+                    <option value="5">5 Minutes (Daily Reset)</option>
+                    <option value="10" selected>10 Minutes (Deep Calm)</option>
+                    <option value="15">15 Minutes (Mindfulness)</option>
+                    <option value="20">20 Minutes (Full Sadhana)</option>
+                    <option value="30">30 Minutes (Deep Immersion)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="ambientSound">Soundscape Atmosphere</label>
+                <select id="ambientSound">
+                    <option value="off" selected>🔕 Mute / Off (Office Friendly)</option>
+                    <option value="ocean">🌊 Calm Ocean Waves</option>
+                    <option value="rain">🌧️ Forest Zen Rain</option>
+                    <option value="om">🕉️ 432Hz Om Binaural Drone</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="bellSound">Bell Transition Chime</label>
+                <select id="bellSound">
+                    <option value="off" selected>🔕 Mute Bell (Silent)</option>
+                    <option value="bowl">🔔 Tibetan Singing Bowl</option>
+                    <option value="bell">✨ Crystal Tingsha Chime</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dynamic Technique Guidance Banner -->
+        <div id="techniqueInfo" class="technique-info-banner">
+            <div>💡 <b>4–6 Ratio:</b> Extended exhalation triggers parasympathetic relaxation, lowering stress hormones.</div>
+        </div>
+
+        <!-- Custom Ratio Inputs -->
+        <div id="customPattern" class="custom-pattern">
+            <div class="control-group">
+                <label>Inhale (Puraka)</label>
+                <input id="customInhale" type="number" min="1" max="30" value="4">
+            </div>
+            <div class="control-group">
+                <label>Hold In (Antar Kumbhaka)</label>
+                <input id="customHold1" type="number" min="0" max="30" value="4">
+            </div>
+            <div class="control-group">
+                <label>Exhale (Rechaka)</label>
+                <input id="customExhale" type="number" min="1" max="30" value="4">
+            </div>
+            <div class="control-group">
+                <label>Hold Out (Bahya Kumbhaka)</label>
+                <input id="customHold2" type="number" min="0" max="30" value="0">
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN BREATHING STAGE CARD -->
+    <div class="card breath-card">
+        <div class="breath-stage">
+            
+            <!-- Nadi Shodhana Left / Right Nostril Visualizer -->
+            <div id="nostrilGuide" class="nostril-guide">
+                <div id="nostrilLeft" class="nostril-pill active">
+                    <span>🌙</span> Left (Ida)
+                </div>
+                <span>⇄</span>
+                <div id="nostrilRight" class="nostril-pill">
+                    Right (Pingala) <span>☀️</span>
+                </div>
+            </div>
+
+            <!-- Metta Bhavana 5-Stage Visualizer -->
+            <div id="mettaGuide" class="metta-guide">
+                <div id="mettaStage1" class="metta-pill active">💖 1. Oneself (Me)</div>
+                <div id="mettaStage2" class="metta-pill">🌸 2. Loved One</div>
+                <div id="mettaStage3" class="metta-pill">🤝 3. Neutral Person</div>
+                <div id="mettaStage4" class="metta-pill">🕊️ 4. Conflicted Person</div>
+                <div id="mettaStage5" class="metta-pill">🌍 5. All Living Beings</div>
+            </div>
+
+            <!-- Guided Visualization 4-Stage Visualizer -->
+            <div id="visGuide" class="vis-guide">
+                <div id="visStage1" class="vis-pill active">✨ 1. Invoke & Connect</div>
+                <div id="visStage2" class="vis-pill">👁️ 2. Deepen Form</div>
+                <div id="visStage3" class="vis-pill">💫 3. Absorb & Feel</div>
+                <div id="visStage4" class="vis-pill">🕊️ 4. Rest in Oneness</div>
+            </div>
+
+            <!-- 7-Chakra Alignment Visualizer -->
+            <div id="chakraGuide" class="chakra-guide">
+                <div id="chakraStage1" class="chakra-pill active c1">🔴 1. LAM (Root)</div>
+                <div id="chakraStage2" class="chakra-pill c2">🟠 2. VAM (Sacral)</div>
+                <div id="chakraStage3" class="chakra-pill c3">🟡 3. RAM (Solar)</div>
+                <div id="chakraStage4" class="chakra-pill c4">🟢 4. YAM (Heart)</div>
+                <div id="chakraStage5" class="chakra-pill c5">🔵 5. HAM (Throat)</div>
+                <div id="chakraStage6" class="chakra-pill c6">🟣 6. OM (Third Eye)</div>
+                <div id="chakraStage7" class="chakra-pill c7">👑 7. AUM (Crown)</div>
+            </div>
+
+            <!-- Glowing Breath Halo & Sphere -->
+            <div class="sphere-outer-wrapper">
+                <div class="halo-ring"></div>
+                <div id="breathSphere" class="breath-sphere" title="Click to Start/Pause">
+                    <div id="visIcon" class="vis-icon" style="display: none;">☀️</div>
+                    <div id="phaseText" class="phase-name">READY</div>
+                    <div id="secondsText" class="phase-seconds">10</div>
+                    <div id="cycleText" class="cycle-badge">Cycle 0</div>
+                </div>
+            </div>
+
+            <!-- Session Time & Progress Bar -->
+            <div class="session-stats-bar">
+                <div class="time-display-wrap">
+                    <span>Time Remaining</span>
+                    <span id="totalTime" class="time-badge">10:00</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="action-buttons">
+                <button id="startBtn" class="btn btn-primary">
+                    ▶ Start Practice
+                </button>
+                <button id="pauseBtn" class="btn btn-secondary" disabled>
+                    ⏸ Pause
+                </button>
+                <button id="resetBtn" class="btn btn-danger">
+                    ↻ Reset
+                </button>
+            </div>
+
+            <!-- Mind Wandered Button -->
+            <button id="mindBtn" class="btn btn-mind">
+                🧠 Mind Wandered (0)
+            </button>
+        </div>
+    </div>
+
+    <!-- LIFETIME PROGRESS & ACHIEVEMENTS -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📊 Prana Practice Insights</div>
+            <div class="pill pill-duration" id="streakBadge">🔥 0 Day Streak</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">📅</div>
+                <div id="todaySessions" class="stat-number">0</div>
+                <div class="stat-desc">Today's Sessions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">⏱️</div>
+                <div id="totalMinutes" class="stat-number">0</div>
+                <div class="stat-desc">Total Minutes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🪷</div>
+                <div id="totalSessions" class="stat-number">0</div>
+                <div class="stat-desc">Completed Sessions</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">😌</div>
+                <div id="avgCalm" class="stat-number">-</div>
+                <div class="stat-desc">Avg Calmness</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🧠</div>
+                <div id="totalWanders" class="stat-number">0</div>
+                <div class="stat-desc">Mind Wanders</div>
+            </div>
+        </div>
+
+        <!-- Milestones Badges -->
+        <div class="badges-container">
+            <div id="badge1" class="achievement-badge" title="Complete your 1st session">🌱 First Breath</div>
+            <div id="badge2" class="achievement-badge" title="3-day practice streak">🔥 3-Day Sadhak</div>
+            <div id="badge3" class="achievement-badge" title="50+ total minutes">💎 Prana Flow (50m)</div>
+            <div id="badge4" class="achievement-badge" title="100+ total minutes">🧘 Zen Master (100m)</div>
+            <div id="badge5" class="achievement-badge" title="Session with 0 mind wanders">✨ Pure Focus</div>
+        </div>
+    </div>
+
+    <!-- SESSION HISTORY TABLE (DATE-WISE) -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">📝 Session History</div>
+            <div class="history-actions" id="historyActions" style="display: none; gap: 8px;">
+                <button id="toggleAllGroupsBtn" class="icon-btn" title="Expand or Collapse All Dates">
+                    ⮟ Collapse All
+                </button>
+                <button id="exportCsvBtn" class="icon-btn" title="Export History as CSV">
+                    📥 Export CSV
+                </button>
+                <button id="clearHistoryBtn" class="icon-btn btn-danger" title="Clear all history">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <div id="history">
+            <div class="empty-history">
+                <div class="empty-history-icon">🍃</div>
+                <div>No sessions recorded yet. Begin your first Pranayama practice above!</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- COMPLETION RATING MODAL -->
+<div id="ratingModal" class="modal-overlay">
+    <div class="modal-box" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 8px;">🪷</div>
+        <h2 style="font-family: 'Cinzel', serif; margin-bottom: 6px;">Sadhana Complete</h2>
+        <p style="color: var(--text-secondary); font-size: 14px;">How serene and centered do you feel right now?</p>
+
+        <div class="rating-btn-group">
+            <button class="rating-btn" data-rating="1">1</button>
+            <button class="rating-btn" data-rating="2">2</button>
+            <button class="rating-btn" data-rating="3">3</button>
+            <button class="rating-btn" data-rating="4">4</button>
+            <button class="rating-btn" data-rating="5">5</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">1 = Restless &nbsp;•&nbsp; 5 = Deeply Serene</p>
+
+        <button id="saveRatingBtn" class="btn btn-primary" style="width: 100%;">
+            ✓ Save Practice Log
+        </button>
+    </div>
+</div>
+
+<!-- PRANAYAMA WISDOM GUIDE MODAL -->
+<div id="guideModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 style="font-family: 'Cinzel', serif; font-size: 18px;">📖 Sacred Pranayama Guide</h2>
+            <button id="closeGuideBtn" class="icon-btn" style="padding: 4px 10px;">✕</button>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌙 Anulom Vilom / Nadi Shodhana <span>▼</span></div>
+            <div class="guide-content show">
+                <b>Channel Balancing Breath:</b> Inhale left nostril, hold briefly, exhale right nostril. Then inhale right, hold, exhale left.<br><br>
+                <b>Benefits:</b> Balances the solar (Pingala) and lunar (Ida) channels, relieves stress, lowers blood pressure, and calms the nervous system.<br>
+                <b>Mudra:</b> Vishnu Mudra with right hand.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🐝 Bhramari (Humming Bee Breath) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Vibrational Calming:</b> Deep diaphragmatic inhale, followed by a long humming sound like a bee during exhale.<br><br>
+                <b>Benefits:</b> Stimulates nitric oxide production, activates the vagus nerve, and instantly relieves mental agitation and insomnia.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🔥 Kapalabhati (Skull Shining) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Vitality & Detox:</b> Active, forceful abdominal contractions during exhalation with natural, passive inhalations.<br><br>
+                <b>Benefits:</b> Clears the respiratory passages, boosts metabolism, stimulates digestive fire (Jatharagni), and awakens mental alertness.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌊 Ujjayi (Victorious Ocean Breath) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Ocean Breath:</b> Inhaling and exhaling through the nose with a gentle constriction at the back of the throat, producing a soft whispering ocean sound.<br><br>
+                <b>Benefits:</b> Synchronizes breath with movement, stabilizes heart rate, builds internal warmth, and deepens focus.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">❄️ Sheetali (Cooling Breath) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Cooling Vitality:</b> Inhaling through a curled tongue (or teeth in Sheetkari) and exhaling smoothly through the nose.<br><br>
+                <b>Benefits:</b> Cools the physical body, reduces Pitta dosha (excess heat/anger), soothes inflammation, and quenches thirst.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🧘 Anapanasati (Mindfulness of Breathing) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Natural Breath Observation:</b> The foundational mindfulness meditation practice of observing the breath naturally as it enters and leaves the body without forcing or controlling it.<br><br>
+                <b>How to Practice:</b> Rest your attention gently at the nostrils or upper lip. Simply feel each natural inhalation and exhalation. When the mind wanders into thoughts or distractions, tap the "Mind Wandered" button and gently return your attention back to the breath.<br><br>
+                <b>Benefits:</b> Cultivates deep mental stillness, strengthens attention span, reduces office fatigue, and develops emotional equanimity.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">💖 Metta Bhavana (5 Loving-Kindness Prayers) <span>▼</span></div>
+            <div class="guide-content">
+                <b>The 5 Loving-Kindness Prayers of the Buddha:</b> A pure heart meditation of cultivating and radiating unconditional goodwill to 5 persons/groups without forced breath control or breath counting.<br><br>
+                <b>The 5 Classical Prayers:</b>
+                <ol style="margin: 8px 0 8px 20px; padding: 0; line-height: 1.6;">
+                    <li><b>1. Me / Oneself (Atta):</b> Focus gently on your heart and radiate self-compassion: <i>"May I be happy, peaceful, healthy, and safe."</i></li>
+                    <li><b>2. Loved One / Benefactor (Priya):</b> Bring a dear mentor, benefactor, or beloved friend to mind: <i>"May you be joyful, healthy, and safe."</i></li>
+                    <li><b>3. Neutral Person (Majjhatta):</b> Bring someone you feel neutral about (an acquaintance or colleague) to mind: <i>"May you live with ease, peace, and well-being."</i></li>
+                    <li><b>4. Conflicted Person (Vairi):</b> Bring someone with whom you have resentment, conflict, or difficulty to mind and open your heart to forgive: <i>"May you find peace, healing, and freedom from suffering."</i></li>
+                    <li><b>5. All World (Sabba-satta):</b> Radiate boundless goodwill in all directions to all living beings everywhere: <i>"May all beings in the world be happy, peaceful, and free."</i></li>
+                </ol>
+                <b>How to Practice:</b> Sit in a relaxed posture. There is no breath manipulation or counting. Simply hold each person in your heart's awareness and sincerely recite the prayer of goodwill.<br><br>
+                <b>Benefits:</b> Completely uproots anger and grudges, heals emotional stress, develops boundless empathy, and brings profound serenity.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🏆 Positive Incident: Breakthrough & Victory (Sankalpa Siddhi) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Mental Rehearsal of Triumph & Manifestation:</b> An empowering visualization practice of mentally experiencing a major goal or positive life breakthrough successfully achieved.<br><br>
+                <b>How to Practice:</b> Close your eyes and see the exact positive event occurring in vivid detail. See the smiling faces, warm handshakes, applause, and celebration. Most importantly, feel the triumphant relief, overwhelming joy, and deep gratitude in your chest.<br><br>
+                <b>Benefits:</b> Rewires the brain for confidence, relieves performance anxiety, aligns subconscious intentions with success, and elevates motivation.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">💌 Positive Incident: Joyful News & Blessings (Subha Samachara) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Visualizing Unexpected Positive News:</b> A deeply uplifting visualization of receiving life-changing positive news, a long-awaited approval, or a joyful surprise.<br><br>
+                <b>How to Practice:</b> Visualize holding your phone or opening a letter and reading the wonderful positive message. Hear the words of celebration. Experience the sudden, glorious wave of weight being lifted off your shoulders and genuine happiness filling your heart.<br><br>
+                <b>Benefits:</b> Elevates mood instantly, breaks depressive thought loops, generates hopeful anticipation, and attracts abundant mindset.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌈 Positive Incident: Harmony & Connection (Maitri Milana) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Healing Relationships through Positive Scenarios:</b> Visualizing a joyful, harmonious reunion or peaceful, productive meeting where everyone connects warmly.<br><br>
+                <b>How to Practice:</b> Visualize meeting with colleagues, family, or partners in an atmosphere of warmth and lightness. See smiling eyes, relaxed body language, and hear pleasant, uplifting conversation. Feel all resistance dissolving into sweet harmony.<br><br>
+                <b>Benefits:</b> Heals interpersonal stress, reduces social anxiety, fosters positive communication, and creates magnetic warmth.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">☀️ Surya Dhyana (Golden Sunshine & Solar Light) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Awakening Solar Prana & Inner Vitality:</b> An ancient visualization meditation harnessing the rejuvenating, life-giving power of golden sunlight.<br><br>
+                <b>How to Practice:</b> Visualize a radiant morning sun rising in your mind's eye. Feel its golden, luminous rays touching your forehead and chest, filling every cell with warmth, banishing tiredness and negativity, and expanding your inner brilliance.<br><br>
+                <b>Benefits:</b> Dissolves lethargy and depression, boosts vitality and mental clarity, strengthens immune energy, and inspires optimism.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🛕 Ishta Devata (Divine Sacred Presence & Statue) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Communion with Sacred Grace:</b> Visualizing a sacred deity, golden statue, or formless divine celestial light seated in the inner sanctum of your heart.<br><br>
+                <b>How to Practice:</b> Invoke the divine presence before you. Visualize the serene, compassionate form shining with pure golden light. Feel a shower of sacred grace, nectar, and unconditional protection embracing your entire being.<br><br>
+                <b>Benefits:</b> Dissolves fears and existential anxiety, deepens spiritual connection, cultivates supreme inner peace, and instills profound reassurance.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🪷 Hridaya Kamala (Blooming Heart Lotus) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Awakening the Center of Unconditional Love:</b> Visualizing a radiant thousand-petaled lotus unfolding inside the chamber of your spiritual heart.<br><br>
+                <b>How to Practice:</b> Rest your attention at the center of your chest. See a tender, luminous pink-gold lotus opening its petals one by one. Experience its heavenly fragrance and pure divine sweetness permeating your entire consciousness.<br><br>
+                <b>Benefits:</b> Heals grief and emotional heartache, awakens universal empathy, purifies emotional blockages, and opens the heart to joy.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌌 Akasha Dhyana (Cosmic Vastness & Starlight) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Expanding into Boundless Cosmic Silence:</b> Contemplation on the infinite night sky sprinkled with glistening diamond stars.<br><br>
+                <b>How to Practice:</b> Close your eyes and visualize looking up into the limitless dark indigo sky. See countless shimmering stars glowing in pure, timeless silence. Allow all thoughts, worries, and ego boundaries to dissolve into the cosmic space.<br><br>
+                <b>Benefits:</b> Relieves claustrophobic stress, dissolves overthinking, brings deep mental space and philosophical perspective, and promotes profound rest.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌊 Samudra Dhyana (Ocean of Serenity & Healing Waters) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Washing Away Tension with Healing Waves:</b> A tranquil visualization of sitting beside an azure ocean of pure healing water.<br><br>
+                <b>How to Practice:</b> Visualize crystal-clear turquoise waves gently lapping at your feet. With each wave that rolls forward, feel revitalizing coolness; with each receding wave, feel all fatigue, worry, and tension pulled out into the vast sea.<br><br>
+                <b>Benefits:</b> Soothes the nervous system, releases chronic physical tension, balances intense emotions, and restores emotional fluidity.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🏔️ Meru Dhyana (Sacred Mountain of Unshakable Stillness) <span>▼</span></div>
+            <div class="guide-content">
+                <b>Cultivating Unbreakable Mental Strength:</b> Visualizing a majestic, snow-capped sacred mountain standing resolute and serene through all seasons.<br><br>
+                <b>How to Practice:</b> Envision a mighty Himalayan mountain rooted deeply into the earth. Feel your posture and mind embody this mountain—storms, winds, and clouds pass overhead, but the mountain remains completely still, solid, and majestic.<br><br>
+                <b>Benefits:</b> Builds resilience to life's storms, stops impulsive reactions, grounds racing thoughts, and develops unwavering dignity.
+            </div>
+        </div>
+
+        <div class="guide-item">
+            <div class="guide-title">🌈 7-Chakra Alignment (Bija Mantras: LAM VAM RAM YAM HAM OM AUM) <span>▼</span></div>
+            <div class="guide-content">
+                <b>The Sacred 7 Energy Centers (Chakras & Seed Mantras):</b> Kundalini energy alignment channeling primordial sound vibrations through the 7 subtle centers along the spinal column.<br><br>
+                <b>The 7 Sacred Chakras, Seed Mantras & Symbols:</b>
+                <ul style="margin: 8px 0 8px 20px; padding: 0; line-height: 1.6;">
+                    <li>🔴 <b>1. Root Chakra (Muladhara) - Mantra: LAM (396 Hz)</b><br>
+                    <i>Location:</i> Base of spine | <i>Element:</i> Earth | <i>Focus:</i> Grounding, physical stability, survival, dissolving fear.</li>
+                    <li>🟠 <b>2. Sacral Chakra (Svadhisthana) - Mantra: VAM (417 Hz)</b><br>
+                    <i>Location:</i> Below navel | <i>Element:</i> Water | <i>Focus:</i> Emotional fluidity, creativity, joy, sensual balance.</li>
+                    <li>🟡 <b>3. Solar Plexus (Manipura) - Mantra: RAM / RUM (528 Hz)</b><br>
+                    <i>Location:</i> Upper abdomen / Navel | <i>Element:</i> Fire | <i>Focus:</i> Iron willpower, courage, confidence, digestive vitality.</li>
+                    <li>🟢 <b>4. Heart Chakra (Anahata) - Mantra: YAM / YUM (639 Hz)</b><br>
+                    <i>Location:</i> Center of chest | <i>Element:</i> Air | <i>Focus:</i> Unconditional love, compassion, forgiveness, emotional healing.</li>
+                    <li>🔵 <b>5. Throat Chakra (Vishuddha) - Mantra: HAM / HUM (741 Hz)</b><br>
+                    <i>Location:</i> Throat center | <i>Element:</i> Ether/Space | <i>Focus:</i> Authentic truth, clear communication, creative expression.</li>
+                    <li>🟣 <b>6. Third Eye Chakra (Ajna) - Mantra: OM / AUM (852 Hz)</b><br>
+                    <i>Location:</i> Center of forehead | <i>Element:</i> Light | <i>Focus:</i> Higher intuition, mental clarity, wisdom, spiritual perception.</li>
+                    <li>👑 <b>7. Crown Chakra (Sahasrara) - Mantra: AUM / SILENCE (963 Hz)</b><br>
+                    <i>Location:</i> Crown of head | <i>Element:</i> Pure Consciousness | <i>Focus:</i> Universal oneness, spiritual liberation, boundless peace.</li>
+                </ul>
+                <b>How to Practice:</b> Sit with your spine upright. As each chakra illuminates, focus your attention on that body center and mentally or softly chant the resonant Bija Mantra (LAM, VAM, RAM, YAM, HAM, OM, AUM).<br><br>
+                <b>Benefits:</b> Removes energy blockages, harmonizes endocrine glands, balances sympathetic and parasympathetic nervous systems, and awakens spiritual vitality.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/breathing.js"></script>
+</body>
+</html>

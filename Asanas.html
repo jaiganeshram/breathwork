@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoga Asana Studio & Sacred Posture Guide – PranaVeda</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% 0%, #edf7f9 0%, #e3f0f4 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(210, 230, 235, 0.75);
+            --text-primary: #192a30;
+            --text-secondary: #5f757d;
+            --text-muted: #8ca2aa;
+            
+            --accent-cyan: #26a5b8;
+            --accent-glow: rgba(38, 165, 184, 0.35);
+            --accent-gold: #e5a93c;
+            --accent-gold-glow: rgba(229, 169, 60, 0.35);
+            --accent-purple: #8b6bc7;
+            --accent-purple-glow: rgba(139, 107, 199, 0.35);
+            --accent-rose: #d6647f;
+            --accent-green: #2ea879;
+            
+            --card-shadow: 0 10px 30px -5px rgba(27, 65, 75, 0.07), 0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+            --btn-shadow: 0 4px 14px rgba(38, 165, 184, 0.3);
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+        }
+
+        body.dark {
+            --bg-gradient: radial-gradient(circle at 50% -10%, #172428 0%, #0c1214 100%);
+            --card-bg: rgba(20, 31, 35, 0.88);
+            --card-border: rgba(46, 68, 76, 0.6);
+            --text-primary: #eaf3f5;
+            --text-secondary: #9cb5bd;
+            --text-muted: #5e7b85;
+            
+            --card-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05) inset;
+            --btn-shadow: 0 4px 18px rgba(38, 165, 184, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px 16px;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 650px;
+            height: 650px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(90px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.55;
+            transition: background 0.8s ease;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 8px var(--accent-glow));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        /* TOP NAVIGATION */
+        .top-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links-left, .nav-actions-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .icon-btn.primary {
+            background: linear-gradient(135deg, var(--accent-cyan), #1b8595);
+            color: #ffffff;
+            border: none;
+            box-shadow: var(--btn-shadow);
+        }
+
+        .icon-btn.primary:hover {
+            background: linear-gradient(135deg, #2ec4db, #26a5b8);
+            box-shadow: 0 6px 18px var(--accent-glow);
+        }
+
+        /* GLASS CARD */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* PILLS & BADGES */
+        .pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pill-beginner {
+            background: rgba(46, 168, 121, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(46, 168, 121, 0.3);
+        }
+
+        .pill-intermediate {
+            background: rgba(229, 169, 60, 0.15);
+            color: var(--accent-gold);
+            border: 1px solid rgba(229, 169, 60, 0.3);
+        }
+
+        .pill-advanced {
+            background: rgba(214, 100, 127, 0.15);
+            color: var(--accent-rose);
+            border: 1px solid rgba(214, 100, 127, 0.3);
+        }
+
+        .pill-chakra {
+            background: rgba(139, 107, 199, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 107, 199, 0.3);
+        }
+
+        .pill-cyan {
+            background: rgba(38, 165, 184, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(38, 165, 184, 0.3);
+        }
+
+        /* SEARCH & FILTER CONTROLS */
+        .search-filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .search-bar-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        body.dark .search-input {
+            background: rgba(14, 23, 26, 0.6);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+
+        .filter-chip.active {
+            background: var(--accent-cyan);
+            color: #ffffff;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* ROUTINES / PRESET FLOWS BANNER */
+        .routines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .routine-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        body.dark .routine-card {
+            background: linear-gradient(135deg, rgba(25, 40, 45, 0.7), rgba(15, 25, 29, 0.5));
+        }
+
+        .routine-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 6px 18px var(--accent-gold-glow);
+        }
+
+        .routine-title {
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .routine-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .routine-meta {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        /* ASANAS CARD GRID */
+        .asanas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 22px;
+        }
+
+        .asana-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .asana-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 14px 28px -6px var(--accent-glow);
+        }
+
+        .asana-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .asana-names {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .asana-sanskrit {
+            font-family: 'Cinzel', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .asana-english {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .asana-devanagari {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .fav-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: transform 0.2s ease, color 0.2s ease;
+            padding: 4px;
+        }
+
+        .fav-btn:hover {
+            transform: scale(1.2);
+            color: var(--accent-rose);
+        }
+
+        .fav-btn.active {
+            color: var(--accent-rose);
+        }
+
+        /* PHOTO & GRAPHIC CONTAINER */
+        .asana-image-box {
+            width: 100%;
+            height: 190px;
+            border-radius: var(--radius-md);
+            position: relative;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(38, 165, 184, 0.08) 0%, rgba(20, 31, 35, 0.04) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.dark .asana-image-box {
+            background: radial-gradient(circle at center, rgba(38, 165, 184, 0.15) 0%, rgba(10, 18, 20, 0.6) 100%);
+        }
+
+        .asana-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+
+        .asana-card:hover .asana-image-box img {
+            transform: scale(1.05);
+        }
+
+        .asana-image-box svg {
+            max-width: 85%;
+            max-height: 85%;
+            transition: transform 0.3s ease;
+        }
+
+        .asana-card:hover .asana-image-box svg {
+            transform: scale(1.05);
+        }
+
+        .view-mode-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(10, 18, 20, 0.65);
+            backdrop-filter: blur(6px);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.4px;
+            z-index: 2;
+        }
+
+        .asana-snippet {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .asana-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .asana-action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--card-border);
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .quick-timer-btn {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(38, 165, 184, 0.1);
+            border: 1px solid rgba(38, 165, 184, 0.25);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quick-timer-btn:hover {
+            background: var(--accent-cyan);
+            color: #ffffff;
+        }
+
+        /* MODAL / POSE DETAIL DRAWER */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 18, 20, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 860px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+
+        .modal-close-btn:hover {
+            transform: rotate(90deg);
+            border-color: var(--accent-rose);
+            color: var(--accent-rose);
+        }
+
+        /* MODAL HERO & PHOTO */
+        .modal-hero {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 22px;
+            align-items: center;
+        }
+
+        @media (max-width: 680px) {
+            .modal-hero {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal-image-box {
+            width: 100%;
+            height: 250px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(38, 165, 184, 0.12) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .modal-image-box svg {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-titles {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .modal-sanskrit {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .modal-english {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+            overflow-x: auto;
+        }
+
+        .modal-tab-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-tab-btn.active {
+            background: rgba(38, 165, 184, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .modal-tab-content {
+            display: none;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .modal-tab-content.active {
+            display: block;
+        }
+
+        .instruction-step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .info-callout {
+            background: rgba(229, 169, 60, 0.1);
+            border-left: 4px solid var(--accent-gold);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+
+        .precaution-callout {
+            background: rgba(214, 100, 127, 0.1);
+            border-left: 4px solid var(--accent-rose);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+
+        /* POSE PRACTICE TIMER WIDGET */
+        .timer-widget {
+            background: linear-gradient(135deg, rgba(38, 165, 184, 0.1), rgba(139, 107, 199, 0.1));
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .timer-display {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .duration-pill-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .duration-pill-btn.active {
+            background: var(--accent-cyan);
+            color: #ffffff;
+            border-color: var(--accent-cyan);
+        }
+
+        /* SURYA NAMASKAR 12-STEP SPECIAL MODAL / SECTION */
+        .surya-stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .surya-step-btn {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        /* CURATED ROUTINE FLOW STUDIO MODAL */
+        .routine-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 14px;
+        }
+
+        .routine-progress-wrap {
+            width: 100%;
+            height: 6px;
+            background: rgba(38, 165, 184, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .routine-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .routine-timeline-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 6px 4px 10px 4px;
+            scrollbar-width: thin;
+        }
+
+        .routine-timeline-card {
+            min-width: 135px;
+            max-width: 145px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .routine-timeline-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+        }
+
+        .routine-timeline-card.active {
+            border-color: var(--accent-gold);
+            background: rgba(229, 169, 60, 0.1);
+            box-shadow: 0 4px 14px var(--accent-gold-glow);
+            transform: scale(1.03);
+        }
+
+        .routine-step-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: var(--accent-cyan);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .routine-timeline-card.active .routine-step-badge {
+            background: var(--accent-gold);
+        }
+
+        .routine-card-thumb {
+            width: 100%;
+            height: 75px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: #111a1d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .routine-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .routine-card-thumb svg {
+            max-width: 80%;
+            max-height: 80%;
+        }
+
+        .routine-card-name {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .routine-card-duration {
+            font-size: 10.5px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 30px 0 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* RESPONSIVE TWEAKS */
+        @media (max-width: 768px) {
+            h1 { font-size: 26px; }
+            .asanas-grid { grid-template-columns: 1fr; }
+            .card { padding: 18px; }
+            .modal-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <header>
+        <div class="logo-wrap">
+            <span class="logo-icon">🕉️</span>
+            <h1>YOGA ASANA STUDIO</h1>
+        </div>
+        <p class="tagline">Sacred Posture Compendium, Alignment Science & Guided Practice Sadhana</p>
+    </header>
+
+    <!-- TOP NAVIGATION BAR -->
+    <div class="top-nav-bar">
+        <div class="nav-links-left">
+            <a href="Breathing_Exercise.html" class="icon-btn primary" title="Switch to Pranayama & Breathwork Studio">
+                🌬️ Pranayama Studio
+            </a>
+            <button id="suryaFlowBtn" class="icon-btn" title="Open 12-Step Classical Surya Namaskar Guide">
+                ☀️ Surya Namaskar (12 Steps)
+            </button>
+            <button id="randomAsanaBtn" class="icon-btn" title="Discover an Asana for today">
+                🎲 Daily Posture
+            </button>
+        </div>
+
+        <div class="nav-actions-right">
+            <button id="themeToggleBtn" class="icon-btn" title="Toggle Light / Dark Mode">
+                🌙 Dark Mode
+            </button>
+            <button id="favFilterBtn" class="icon-btn" title="Show Bookmarked Asanas">
+                ❤️ Saved (<span id="favCount">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <!-- CURATED PRACTICE FLOWS / ROUTINES BANNER -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">✨ Curated Asana Sequences</div>
+            <span class="pill pill-cyan">🧘 Ready-to-Practice Flows</span>
+        </div>
+        <div class="routines-grid">
+            <div class="routine-card" onclick="startRoutine('morning')">
+                <div class="routine-title">🌅 Morning Awakening</div>
+                <div class="routine-desc">Gentle standing and backbend flow to activate spine & vitality.</div>
+                <div class="routine-meta">
+                    <span>6 Asanas</span>
+                    <span>15 Mins</span>
+                </div>
+            </div>
+
+            <div class="routine-card" onclick="startRoutine('desk')">
+                <div class="routine-title">🪑 Desk & Spine Relief</div>
+                <div class="routine-desc">Opens tight shoulders, thoracic spine and hip flexors.</div>
+                <div class="routine-meta">
+                    <span>5 Asanas</span>
+                    <span>10 Mins</span>
+                </div>
+            </div>
+
+            <div class="routine-card" onclick="startRoutine('evening')">
+                <div class="routine-title">🌙 Evening Deep Calming</div>
+                <div class="routine-desc">Restorative forward bends & supine poses for peaceful sleep.</div>
+                <div class="routine-meta">
+                    <span>5 Asanas</span>
+                    <span>15 Mins</span>
+                </div>
+            </div>
+
+            <div class="routine-card" onclick="startRoutine('strength')">
+                <div class="routine-title">⚡ Core Fire & Stamina</div>
+                <div class="routine-desc">Warrior poses, Chair, Boat & Bridge for whole-body strength.</div>
+                <div class="routine-meta">
+                    <span>6 Asanas</span>
+                    <span>18 Mins</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH & CATEGORY FILTERS CARD -->
+    <div class="card">
+        <div class="search-filter-section">
+            <div class="search-bar-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="asanaSearchInput" class="search-input" placeholder="Search by Sanskrit name, English name, benefit (e.g. back pain, digestion, hips, calming)...">
+            </div>
+
+            <div class="filter-row" id="categoryFilterRow">
+                <button class="filter-chip active" data-category="all">🌟 All Categories (<span id="totalCount">35</span>)</button>
+                <button class="filter-chip" data-category="standing">🧍 Standing</button>
+                <button class="filter-chip" data-category="seated">🧘 Seated & Meditative</button>
+                <button class="filter-chip" data-category="backbend">🐍 Backbends & Spine</button>
+                <button class="filter-chip" data-category="inversion">🔄 Inversions & Core</button>
+                <button class="filter-chip" data-category="restorative">🌿 Restorative & Calming</button>
+            </div>
+
+            <div class="filter-row" id="levelFilterRow" style="padding-top: 2px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-right: 4px;">LEVEL:</span>
+                <button class="filter-chip active" data-level="all">All Levels</button>
+                <button class="filter-chip" data-level="Beginner">🟢 Beginner</button>
+                <button class="filter-chip" data-level="Intermediate">🟡 Intermediate</button>
+                <button class="filter-chip" data-level="Advanced">🔴 Advanced</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASANAS GRID LIST -->
+    <div class="asanas-grid" id="asanasContainer">
+        <!-- Dynamic Asana Cards will be populated here -->
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>PranaVeda Sacred Yoga Studio • Practice with Ahimsa (Non-violence) and Sthira-Sukham (Steady & Comfortable)</p>
+    </footer>
+</div>
+
+<!-- ==========================================================================
+     DETAIL & PRACTICE MODAL
+     ========================================================================== -->
+<div class="modal-overlay" id="asanaModal">
+    <div class="modal-content">
+        <button class="modal-close-btn" id="modalCloseBtn" title="Close Modal">&times;</button>
+        
+        <div class="modal-hero">
+            <div class="modal-image-box" id="modalImageBox">
+                <!-- Image or SVG Pose Graphic -->
+            </div>
+            <div class="modal-titles">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <span id="modalCategoryBadge" class="pill pill-cyan">Standing</span>
+                    <span id="modalLevelBadge" class="pill pill-beginner">Beginner</span>
+                    <span id="modalChakraBadge" class="pill pill-chakra">Muladhara</span>
+                </div>
+                <h2 id="modalSanskritName" class="modal-sanskrit">Tadasana</h2>
+                <div id="modalDevanagari" style="font-size:14px; color:var(--text-muted);">ताड़ासन</div>
+                <div id="modalEnglishName" class="modal-english">Mountain Pose</div>
+            </div>
+        </div>
+
+        <div class="modal-tabs">
+            <button class="modal-tab-btn active" data-tab="tabHowTo">📖 How to Do (Steps)</button>
+            <button class="modal-tab-btn" data-tab="tabBenefits">✨ Benefits & Anatomy</button>
+            <button class="modal-tab-btn" data-tab="tabPrecautions">⚠️ Precautions & Tips</button>
+            <button class="modal-tab-btn" data-tab="tabPractice">⏱️ Hold Timer</button>
+        </div>
+
+        <!-- TAB 1: HOW TO DO -->
+        <div class="modal-tab-content active" id="tabHowTo">
+            <div id="modalStepList">
+                <!-- Dynamic steps -->
+            </div>
+            <div class="info-callout" id="modalBreathCue">
+                <strong>🌬️ Breath Coordination:</strong> Inhale to lengthen spine, exhale to ground.
+            </div>
+        </div>
+
+        <!-- TAB 2: BENEFITS -->
+        <div class="modal-tab-content" id="tabBenefits">
+            <h4 style="margin-bottom:8px; color:var(--accent-cyan);">🌿 Key Health Benefits</h4>
+            <ul id="modalBenefitsList" style="padding-left: 20px; display:flex; flex-direction:column; gap:6px;">
+                <!-- Dynamic benefits -->
+            </ul>
+            <div style="margin-top:14px;">
+                <strong>🎯 Primary Target Areas:</strong> <span id="modalTargetAreas" style="color:var(--text-secondary);">Spine, Hamstrings, Hips</span>
+            </div>
+        </div>
+
+        <!-- TAB 3: PRECAUTIONS -->
+        <div class="modal-tab-content" id="tabPrecautions">
+            <div class="precaution-callout" id="modalContraindications">
+                <strong>⚠️ Contraindications:</strong> Avoid in severe spine injuries.
+            </div>
+            <div class="info-callout" id="modalModifications">
+                <strong>💡 Modifications for Beginners:</strong> Use a wall for balance support.
+            </div>
+        </div>
+
+        <!-- TAB 4: PRACTICE TIMER -->
+        <div class="modal-tab-content" id="tabPractice">
+            <div class="timer-widget">
+                <div style="font-size:13px; font-weight:700; color:var(--accent-cyan);">POSE HOLD SADHANA</div>
+                <div class="timer-display" id="poseTimerText">00:30</div>
+                
+                <div class="timer-controls">
+                    <button class="duration-pill-btn" onclick="setHoldDuration(15)">15s</button>
+                    <button class="duration-pill-btn active" onclick="setHoldDuration(30)">30s</button>
+                    <button class="duration-pill-btn" onclick="setHoldDuration(45)">45s</button>
+                    <button class="duration-pill-btn" onclick="setHoldDuration(60)">60s</button>
+                    <button class="duration-pill-btn" onclick="setHoldDuration(90)">90s</button>
+                    <button class="duration-pill-btn" onclick="setHoldDuration(120)">2 Min</button>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:6px;">
+                    <button id="startPoseTimerBtn" class="icon-btn primary" onclick="togglePoseTimer()">
+                        ▶️ Start Hold Timer
+                    </button>
+                    <button class="icon-btn" onclick="resetPoseTimer()">
+                        🔄 Reset
+                    </button>
+                </div>
+                <div id="sideSwitchNote" style="font-size:11.5px; color:var(--text-muted); text-align:center;">
+                    🔔 Audio bell will chime when time completes. Switch sides gracefully.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     SURYA NAMASKAR 12-STEP MODAL
+     ========================================================================== -->
+<div class="modal-overlay" id="suryaModal">
+    <div class="modal-content" style="max-width: 860px;">
+        <button class="modal-close-btn" id="suryaModalCloseBtn" title="Close Surya Namaskar">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 10px;">
+            <span class="pill pill-intermediate" style="background: rgba(229, 169, 60, 0.2); color: var(--accent-gold);">☀️ Dynamic 12-Vinyasa Solar Sadhana</span>
+            <h2 style="font-family: 'Cinzel', serif; font-size: 24px; margin-top: 6px;">SURYA NAMASKAR (Sun Salutation)</h2>
+            <p style="font-size: 13px; color: var(--text-secondary);">Harmonizing the Solar Plexus, breath rhythms, and spinal flexibility.</p>
+        </div>
+
+        <div class="surya-stepper" id="suryaStepIcons">
+            <!-- 1 to 12 step numbers -->
+        </div>
+
+        <div class="modal-hero">
+            <div class="modal-image-box" id="suryaImageBox">
+                <!-- Surya pose photo/illustration -->
+            </div>
+            <div class="modal-titles">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span id="suryaStepBadge" class="pill pill-cyan">Step 1 of 12</span>
+                    <span id="suryaChakraBadge" class="pill pill-chakra">Anahata (Heart)</span>
+                </div>
+                <h3 id="suryaSanskritName" style="font-family:'Cinzel', serif; font-size:22px;">1. Pranamasana</h3>
+                <div id="suryaEnglishName" style="color:var(--accent-gold); font-weight:600; font-size:14px;">Prayer Pose</div>
+                <div id="suryaMantra" style="font-size:13.5px; font-weight:700; color:var(--accent-cyan); margin-top:4px;">
+                    🕉️ Mantra: <i>Om Mitraya Namaha</i> (Salutations to the Friend of All)
+                </div>
+            </div>
+        </div>
+
+        <div class="info-callout" id="suryaBreathInstruction">
+            <strong>🌬️ Breath Cue:</strong> Exhale completely bringing palms together at the heart center.
+        </div>
+
+        <div id="suryaDescription" style="font-size: 13.5px; line-height: 1.6; color: var(--text-primary);">
+            Stand tall with feet together. Bring palms together in Anjali Mudra in front of your chest. Relax shoulders and maintain an upright, grounded spine.
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
+            <button class="icon-btn" onclick="prevSuryaStep()">⬅️ Previous Step</button>
+            <div style="display: flex; gap: 8px;">
+                <button id="suryaAutoPlayBtn" class="icon-btn primary" onclick="toggleSuryaAutoPlay()">▶️ Auto-Guided Flow (5s / step)</button>
+            </div>
+            <button class="icon-btn" onclick="nextSuryaStep()">Next Step ➡️</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     CURATED ROUTINE SEQUENCE FLOW STUDIO MODAL
+     ========================================================================== -->
+<div class="modal-overlay" id="routineModal">
+    <div class="modal-content" style="max-width: 900px;">
+        <button class="modal-close-btn" id="routineModalCloseBtn" title="Close Routine Flow">&times;</button>
+        
+        <div class="routine-header-banner">
+            <div>
+                <span id="routineTagBadge" class="pill pill-intermediate" style="background:rgba(229,169,60,0.18); color:var(--accent-gold);">☀️ Prana & Vitality Boost</span>
+                <h2 id="routineFlowTitle" style="font-family:'Cinzel', serif; font-size:24px; margin-top:6px;">🌅 Morning Awakening Flow</h2>
+                <p id="routineFlowDesc" style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+                    A carefully sequenced 6-pose sadhana designed to stretch the spine and awaken vitality.
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <span id="routineMetaBadge" class="pill pill-cyan">6 Asanas • 15 Mins</span>
+                <div id="routineProgressText" style="font-size: 12px; font-weight:700; color:var(--accent-gold); margin-top:6px;">
+                    Pose 1 of 6
+                </div>
+            </div>
+            <div class="routine-progress-wrap">
+                <div class="routine-progress-bar" id="routineProgressBar"></div>
+            </div>
+        </div>
+
+        <!-- ALL ASANAS SEQUENCE TIMELINE (CLICKABLE) -->
+        <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                📋 Complete Flow Sequence (Click any Asana to view/jump)
+            </div>
+            <div class="routine-timeline-scroll" id="routineTimelineContainer">
+                <!-- Dynamic sequence timeline cards (all 6 visible) -->
+            </div>
+        </div>
+
+        <!-- ACTIVE POSE PLAYER HERO -->
+        <div class="modal-hero" style="background: rgba(38,165,184,0.04); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px;">
+            <div class="modal-image-box" id="routineActiveImageBox" style="height: 220px;">
+                <!-- Active pose photo/svg -->
+            </div>
+            <div class="modal-titles">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <span id="routinePoseNumberBadge" class="pill pill-cyan">Step 1 of 6</span>
+                    <span id="routinePoseChakraBadge" class="pill pill-chakra">Muladhara</span>
+                    <span id="routinePoseTargetBadge" class="pill pill-beginner">Spine & Posture</span>
+                </div>
+                <h3 id="routinePoseSanskritName" style="font-family:'Cinzel', serif; font-size:22px;">Tadasana</h3>
+                <div id="routinePoseEnglishName" style="color:var(--accent-cyan); font-weight:600; font-size:14px;">Mountain Pose</div>
+                
+                <div class="info-callout" id="routinePoseInstruction" style="margin: 6px 0 0 0; padding: 8px 12px; font-size: 12.5px;">
+                    Ground through feet, lengthen spine upward, and breathe with deep awareness.
+                </div>
+            </div>
+        </div>
+
+        <!-- FLOW SADHANA CONTROLS & COUNTDOWN TIMER -->
+        <div class="timer-widget" style="margin-top: 0; padding: 16px;">
+            <div id="routineTimerStateText" style="font-size:12px; font-weight:700; color:var(--accent-cyan); text-transform:uppercase;">
+                ACTIVE POSE HOLD
+            </div>
+            <div class="timer-display" id="routineTimerDisplay" style="font-size:36px;">00:45</div>
+            
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center;">
+                <button class="icon-btn" onclick="prevRoutinePose()">⏮️ Previous Pose</button>
+                <button id="routinePlayBtn" class="icon-btn primary" onclick="toggleRoutineAutoPlay()" style="padding: 10px 22px; font-size: 14px;">
+                    ▶️ Start Full Guided Flow
+                </button>
+                <button class="icon-btn" onclick="nextRoutinePose()">Next Pose ⏭️</button>
+            </div>
+            <div style="font-size:11.5px; color:var(--text-muted); text-align:center;">
+                🔔 Automatic bell chimes will signal each hold and transition smoothly to the next Asana.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     JAVASCRIPT LOGIC & ASANA DATA
+     ========================================================================== -->
+<script src="js/asanas.js"></script>
+
+</body>
+</html>
