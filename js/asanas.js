@@ -376,7 +376,7 @@ const ASANAS = [
     {
         id: "tadasana",
         sanskrit: "Tadasana",
-        devanagari: "ताड़ासन",
+        devanagari: "தாடாசனம்",
         english: "Mountain Pose",
         category: "standing",
         level: "Beginner",
@@ -405,7 +405,7 @@ const ASANAS = [
     {
         id: "vrikshasana",
         sanskrit: "Vrikshasana",
-        devanagari: "वृक्षासन",
+        devanagari: "விருக்ஷாசனம்",
         english: "Tree Pose",
         category: "standing",
         level: "Beginner",
@@ -434,7 +434,7 @@ const ASANAS = [
     {
         id: "trikonasana",
         sanskrit: "Utthita Trikonasana",
-        devanagari: "उत्थित त्रिकोणासन",
+        devanagari: "உத்தித திரிகோணாசனம்",
         english: "Extended Triangle Pose",
         category: "standing",
         level: "Beginner",
@@ -463,7 +463,7 @@ const ASANAS = [
     {
         id: "virabhadrasana1",
         sanskrit: "Virabhadrasana I",
-        devanagari: "वीरभद्रासन १",
+        devanagari: "வீரபத்ராசனம் 1",
         english: "Warrior I Pose",
         category: "standing",
         level: "Beginner",
@@ -491,7 +491,7 @@ const ASANAS = [
     {
         id: "virabhadrasana2",
         sanskrit: "Virabhadrasana II",
-        devanagari: "वीरभद्रासन २",
+        devanagari: "வீரபத்ராசனம் 2",
         english: "Warrior II Pose",
         category: "standing",
         level: "Beginner",
@@ -519,7 +519,7 @@ const ASANAS = [
     {
         id: "utkatasana",
         sanskrit: "Utkatasana",
-        devanagari: "उत्कटासन",
+        devanagari: "உத்கடாசனம்",
         english: "Chair Pose (Fierce Pose)",
         category: "standing",
         level: "Beginner",
@@ -547,7 +547,7 @@ const ASANAS = [
     {
         id: "garudasana",
         sanskrit: "Garudasana",
-        devanagari: "गरुड़ासन",
+        devanagari: "கருடாசனம்",
         english: "Eagle Pose",
         category: "standing",
         level: "Intermediate",
@@ -575,7 +575,7 @@ const ASANAS = [
     {
         id: "uttanasana",
         sanskrit: "Padahastasana / Uttanasana",
-        devanagari: "उत्तानासन / पादहस्तासन",
+        devanagari: "உத்தானாசனம் / பாதஹஸ்தாசனம்",
         english: "Standing Forward Bend",
         category: "standing",
         level: "Beginner",
@@ -603,7 +603,7 @@ const ASANAS = [
     {
         id: "padmasana",
         sanskrit: "Padmasana",
-        devanagari: "पद्मासन",
+        devanagari: "பத்மாசனம்",
         english: "Lotus Pose",
         category: "seated",
         level: "Advanced",
@@ -631,7 +631,7 @@ const ASANAS = [
     {
         id: "sukhasana",
         sanskrit: "Sukhasana",
-        devanagari: "सुखासन",
+        devanagari: "சுகாசனம்",
         english: "Easy Pose (Decent Pose)",
         category: "seated",
         level: "Beginner",
@@ -659,7 +659,7 @@ const ASANAS = [
     {
         id: "vajrasana",
         sanskrit: "Vajrasana",
-        devanagari: "वज्रासन",
+        devanagari: "வஜ்ராசனம்",
         english: "Thunderbolt / Diamond Pose",
         category: "seated",
         level: "Beginner",
@@ -687,7 +687,7 @@ const ASANAS = [
     {
         id: "paschimottanasana",
         sanskrit: "Paschimottanasana",
-        devanagari: "पश्चिमोत्तानासन",
+        devanagari: "பஸ்சிமோத்தானாசனம்",
         english: "Seated Forward Bend",
         category: "seated",
         level: "Beginner",
@@ -715,7 +715,7 @@ const ASANAS = [
     {
         id: "baddha_konasana",
         sanskrit: "Baddha Konasana",
-        devanagari: "बद्धकोणासन",
+        devanagari: "பத்த கோணாசனம்",
         english: "Bound Angle / Butterfly Pose",
         category: "seated",
         level: "Beginner",
@@ -743,7 +743,7 @@ const ASANAS = [
     {
         id: "gomukhasana",
         sanskrit: "Gomukhasana",
-        devanagari: "गोमुखासन",
+        devanagari: "கோமுகாசனம்",
         english: "Cow Face Pose",
         category: "seated",
         level: "Intermediate",
@@ -771,7 +771,7 @@ const ASANAS = [
     {
         id: "ardha_matsyendrasana",
         sanskrit: "Ardha Matsyendrasana",
-        devanagari: "अर्धमत्स्येन्द्रासन",
+        devanagari: "அர்த்த மத்ச்யேந்திராசனம்",
         english: "Half Lord of the Fishes Pose",
         category: "seated",
         level: "Intermediate",
@@ -799,7 +799,7 @@ const ASANAS = [
     {
         id: "janu_sirsasana",
         sanskrit: "Janu Sirsasana",
-        devanagari: "जानुशीर्षासन",
+        devanagari: "ஜானு சீர்ஷாசனம்",
         english: "Head-to-Knee Pose",
         category: "seated",
         level: "Beginner",
@@ -827,7 +827,7 @@ const ASANAS = [
     {
         id: "bhujangasana",
         sanskrit: "Bhujangasana",
-        devanagari: "भुजङ्गासन",
+        devanagari: "புஜங்காசனம்",
         english: "Cobra Pose",
         category: "backbend",
         level: "Beginner",
@@ -855,7 +855,7 @@ const ASANAS = [
     {
         id: "dhanurasana",
         sanskrit: "Dhanurasana",
-        devanagari: "धनुरासन",
+        devanagari: "தனுராசனம்",
         english: "Bow Pose",
         category: "backbend",
         level: "Intermediate",
@@ -883,7 +883,7 @@ const ASANAS = [
     {
         id: "shalabhasana",
         sanskrit: "Shalabhasana",
-        devanagari: "शलभासन",
+        devanagari: "சலபாசனம்",
         english: "Locust Pose",
         category: "backbend",
         level: "Beginner",
@@ -911,7 +911,7 @@ const ASANAS = [
     {
         id: "ustrasana",
         sanskrit: "Ustrasana",
-        devanagari: "उष्ट्रासन",
+        devanagari: "உஷ்ட்ராசனம்",
         english: "Camel Pose",
         category: "backbend",
         level: "Intermediate",
@@ -939,7 +939,7 @@ const ASANAS = [
     {
         id: "setu_bandhasana",
         sanskrit: "Setu Bandhasana",
-        devanagari: "सेतुबन्धासन",
+        devanagari: "சேது பந்தாசனம்",
         english: "Bridge Pose",
         category: "backbend",
         level: "Beginner",
@@ -967,7 +967,7 @@ const ASANAS = [
     {
         id: "chakrasana",
         sanskrit: "Chakrasana / Urdhva Dhanurasana",
-        devanagari: "चक्रासन / ऊर्ध्वधनुरासन",
+        devanagari: "சக்ராசனம் / ஊர்த்வ தனுராசனம்",
         english: "Wheel Pose (Upward-Facing Bow)",
         category: "backbend",
         level: "Advanced",
@@ -995,7 +995,7 @@ const ASANAS = [
     {
         id: "cat_cow",
         sanskrit: "Marjaryasana-Bitilasana",
-        devanagari: "मार्जरी-बितिलासन",
+        devanagari: "மார்ஜர்யாசனம்-பிதிலாசனம்",
         english: "Cat-Cow Dynamic Flow",
         category: "backbend",
         level: "Beginner",
@@ -1022,7 +1022,7 @@ const ASANAS = [
     {
         id: "adho_mukha_svanasana",
         sanskrit: "Adho Mukha Svanasana",
-        devanagari: "अधोमुखश्वानासन",
+        devanagari: "அதோ முக ஸ்வானாசனம்",
         english: "Downward-Facing Dog",
         category: "inversion",
         level: "Beginner",
@@ -1050,7 +1050,7 @@ const ASANAS = [
     {
         id: "sarvangasana",
         sanskrit: "Salamba Sarvangasana",
-        devanagari: "सालम्ब सर्वाङ्गासन",
+        devanagari: "சாலாம்ப சர்வாங்காசனம்",
         english: "Supported Shoulder Stand",
         category: "inversion",
         level: "Intermediate",
@@ -1078,7 +1078,7 @@ const ASANAS = [
     {
         id: "halasana",
         sanskrit: "Halasana",
-        devanagari: "हलासन",
+        devanagari: "ஹலாசனம்",
         english: "Plow Pose",
         category: "inversion",
         level: "Intermediate",
@@ -1106,7 +1106,7 @@ const ASANAS = [
     {
         id: "matsyasana",
         sanskrit: "Matsyasana",
-        devanagari: "मत्स्यासन",
+        devanagari: "மத்ஸ்யாசனம்",
         english: "Fish Pose",
         category: "backbend",
         level: "Beginner",
@@ -1134,7 +1134,7 @@ const ASANAS = [
     {
         id: "sirsasana",
         sanskrit: "Salamba Sirsasana",
-        devanagari: "सालम्ब शीर्षासन",
+        devanagari: "சாலாம்ப சீர்ஷாசனம்",
         english: "Headstand (King of Asanas)",
         category: "inversion",
         level: "Advanced",
@@ -1162,7 +1162,7 @@ const ASANAS = [
     {
         id: "navasana",
         sanskrit: "Paripurna Navasana",
-        devanagari: "परिपूर्ण नावासन",
+        devanagari: "பரிபூர்ண நாவாசனம்",
         english: "Full Boat Pose",
         category: "inversion",
         level: "Intermediate",
@@ -1190,7 +1190,7 @@ const ASANAS = [
     {
         id: "bakasana",
         sanskrit: "Bakasana",
-        devanagari: "बकासन",
+        devanagari: "பகாசனம் / காகாசனம்",
         english: "Crow / Crane Pose",
         category: "inversion",
         level: "Advanced",
@@ -1218,7 +1218,7 @@ const ASANAS = [
     {
         id: "balasana",
         sanskrit: "Balasana",
-        devanagari: "बालासन",
+        devanagari: "பாலாசனம்",
         english: "Child's Pose",
         category: "restorative",
         level: "Beginner",
@@ -1246,7 +1246,7 @@ const ASANAS = [
     {
         id: "viparita_karani",
         sanskrit: "Viparita Karani",
-        devanagari: "विपरीतकरणी",
+        devanagari: "விபரீத கரணி",
         english: "Legs-Up-The-Wall Pose",
         category: "restorative",
         level: "Beginner",
@@ -1274,7 +1274,7 @@ const ASANAS = [
     {
         id: "supta_matsyendrasana",
         sanskrit: "Supta Matsyendrasana",
-        devanagari: "सुप्तमत्स्येन्द्रासन",
+        devanagari: "சுப்த மத்ச்யேந்திராசனம்",
         english: "Supine Spinal Twist",
         category: "restorative",
         level: "Beginner",
@@ -1302,7 +1302,7 @@ const ASANAS = [
     {
         id: "shavasana",
         sanskrit: "Shavasana",
-        devanagari: "शवासन",
+        devanagari: "சவாசனம்",
         english: "Corpse Pose (Conscious Relaxation)",
         category: "restorative",
         level: "Beginner",

@@ -250,7 +250,7 @@
     const VEDIC_PRAHARS = [
         {
             name: "Brahma Muhurta",
-            sanskrit: "ब्रह्म मुहूर्त",
+            sanskrit: "பிரம்ம முஹூர்த்தம்",
             startHour: 3.5, // 03:30
             endHour: 5.5,   // 05:30
             energy: "Supreme Sattva (Divine Clarity)",
@@ -260,7 +260,7 @@
         },
         {
             name: "Pratah Sandhya (Dawn)",
-            sanskrit: "प्रातः सन्ध्या",
+            sanskrit: "ப்ராத: ஸந்த்யா",
             startHour: 5.5,
             endHour: 8.5,
             energy: "Awakening Solar Fire (Tejas)",
@@ -270,7 +270,7 @@
         },
         {
             name: "Sangava (Morning Active)",
-            sanskrit: "सङ्गव",
+            sanskrit: "ஸங்க³வ",
             startHour: 8.5,
             endHour: 12.0,
             energy: "Dynamic Manifestation",
@@ -280,7 +280,7 @@
         },
         {
             name: "Madhyahna (Midday Solar Peak)",
-            sanskrit: "मध्याह्न",
+            sanskrit: "மத்⁴யாஹ்னம்",
             startHour: 12.0,
             endHour: 15.5,
             energy: "Pitta Digestive Agni",
@@ -290,7 +290,7 @@
         },
         {
             name: "Aparahna (Afternoon Serenity)",
-            sanskrit: "अपराह्न",
+            sanskrit: "அபராஹ்னம்",
             startHour: 15.5,
             endHour: 18.0,
             energy: "Grounding Prana",
@@ -300,7 +300,7 @@
         },
         {
             name: "Sayam Sandhya (Sunset Twilight)",
-            sanskrit: "सायं सन्ध्या",
+            sanskrit: "ஸாயம் ஸந்த்யா",
             startHour: 18.0,
             endHour: 20.5,
             energy: "Introspective Calm",
@@ -310,7 +310,7 @@
         },
         {
             name: "Pradosha / Ratri (Evening Rest)",
-            sanskrit: "प्रदोष / रात्रि",
+            sanskrit: "ப்ரதோஷம் / ராத்ரி",
             startHour: 20.5,
             endHour: 23.5,
             energy: "Deep Restoration & Yoga Nidra",
@@ -320,7 +320,7 @@
         },
         {
             name: "Nisitha (Midnight Silence)",
-            sanskrit: "निशीथ",
+            sanskrit: "நிஶீதம்",
             startHour: 23.5,
             endHour: 27.5, // 03:30 next day
             energy: "Sacred Silence & Cellular Repair",
@@ -382,42 +382,42 @@
        ========================================================================== */
     const SACRED_VERSES = [
         {
-            sanskrit: "योगश्चित्तवृत्तिनिरोधः ॥ १.२ ॥",
+            sanskrit: "யோகஶ்சித்த விருத்தி நிரோதஹ் ॥ 1.2 ॥",
             translit: "Yogaś citta-vṛtti-nirodhaḥ",
             source: "Patanjali Yoga Sutras 1.2",
             meaning: "Yoga is the stilling and intentional mastery of the fluctuations of the mind.",
             insight: "When the mind's waves become calm like a crystal lake, the true inner Self shines through untouched."
         },
         {
-            sanskrit: "तस्मिन् सति श्वासप्रश्वासयोर्गतिविच्छेदः प्राणायामः ॥ २.४९ ॥",
+            sanskrit: "தஸ்மின் ஸதி ஶ்வாஸப்ரஶ்வாஸயோர் கதிவிச்சேத³ஹ் ப்ராணாயாமஹ் ॥ 2.49 ॥",
             translit: "Tasmin sati śvāsa-praśvāsayor gati-vicchedaḥ prāṇāyāmaḥ",
             source: "Patanjali Yoga Sutras 2.49",
             meaning: "Pranayama is the conscious regulation and stilling of the motion of inhalation and exhalation.",
             insight: "By mastering the golden thread of the breath, you unlock direct command over life-force and nervous equilibrium."
         },
         {
-            sanskrit: "स्थिरसुखमासनम् ॥ २.४६ ॥",
+            sanskrit: "ஸ்திர ஸுக²ம் ஆஸனம் ॥ 2.46 ॥",
             translit: "Sthira-sukham āsanam",
             source: "Patanjali Yoga Sutras 2.46",
             meaning: "Posture (Asana) should be steady, grounded, and imbued with ease and joyful lightness.",
             insight: "True posture is never rigid strain; it is an effortless balance of firm foundation and spacious inner ease."
         },
         {
-            sanskrit: "चले वाते चलं चित्तं निश्चले निश्चलं भवेत् ॥ २.२ ॥",
+            sanskrit: "சலே வாதே சலம் சித்தம் நிஶ்சலே நிஶ்சலம் பவேத் ॥ 2.2 ॥",
             translit: "Cale vāte calaṁ cittaṁ niścale niścalaṁ bhavet",
             source: "Hatha Yoga Pradipika 2.2",
             meaning: "When the breath moves, the mind wanders. When the breath is still, the mind attains immovable stillness.",
             insight: "Breath and consciousness are two wings of the same bird. Steady one, and the other settles instantly."
         },
         {
-            sanskrit: "समत्वं योग उच्यते ॥ २.४८ ॥",
+            sanskrit: "ஸமத்வம் யோக³ உச்யதே ॥ 2.48 ॥",
             translit: "Samatvaṁ yoga ucyate",
             source: "Bhagavad Gita 2.48",
             meaning: "Equanimity, balance, and centered poise in all states of life is declared to be Yoga.",
             insight: "Neither clinging to joy nor collapsing in trial—centered in the quiet witness within."
         },
         {
-            sanskrit: "शरीरमाद्यं खलु धर्मसाधनम् ॥",
+            sanskrit: "ஶரீரம் ஆத்³யம் க²லு த⁴ர்மஸாத⁴னம் ॥",
             translit: "Śarīram ādyaṁ khalu dharma-sādhanam",
             source: "Kalidasa - Kumarasambhava",
             meaning: "The physical body is verily the primal and sacred instrument for fulfilling spiritual purpose.",
@@ -659,7 +659,7 @@
         {
             id: "root",
             name: "Muladhara (Root)",
-            sanskrit: "मूलाधार",
+            sanskrit: "மூலாதாரம்",
             freq: 396,
             note: "UT",
             seed: "LAM",
@@ -671,7 +671,7 @@
         {
             id: "sacral",
             name: "Svadhisthana (Sacral)",
-            sanskrit: "स्वाधिष्ठान",
+            sanskrit: "ஸ்வாதிஷ்டானம்",
             freq: 417,
             note: "RE",
             seed: "VAM",
@@ -683,7 +683,7 @@
         {
             id: "solar",
             name: "Manipura (Solar Plexus)",
-            sanskrit: "मणिपूर",
+            sanskrit: "மணிபூரகம்",
             freq: 528,
             note: "MI (Miracle)",
             seed: "RAM",
@@ -695,7 +695,7 @@
         {
             id: "heart",
             name: "Anahata (Heart)",
-            sanskrit: "अनाहत",
+            sanskrit: "அனாஹதம்",
             freq: 639,
             note: "FA",
             seed: "YAM",
@@ -707,7 +707,7 @@
         {
             id: "throat",
             name: "Vishuddha (Throat)",
-            sanskrit: "विशुद्ध",
+            sanskrit: "விசுத்தி",
             freq: 741,
             note: "SOL",
             seed: "HAM",
@@ -719,7 +719,7 @@
         {
             id: "third-eye",
             name: "Ajna (Third Eye)",
-            sanskrit: "आज्ञा",
+            sanskrit: "ஆக்ஞா",
             freq: 852,
             note: "LA",
             seed: "OM",
@@ -731,7 +731,7 @@
         {
             id: "crown",
             name: "Sahasrara (Crown)",
-            sanskrit: "सहस्रार",
+            sanskrit: "ஸஹஸ்ராரம்",
             freq: 963,
             note: "SI",
             seed: "AUM",
@@ -1264,16 +1264,16 @@
        8. ASANA SHOWCASE & GALLERY CAROUSEL
        ========================================================================== */
     const SHOWCASE_ASANAS = [
-        { id: "padmasana", name: "Padmasana", dev: "पद्मासन", eng: "Lotus Pose", cat: "seated", chakra: "Sahasrara & Muladhara", img: "images/padmasana.jpg", benefit: "Classical posture for pranayama, stabilizes pelvis, calms mind and directs prana up sushumna." },
-        { id: "vrikshasana", name: "Vrikshasana", dev: "वृक्षासन", eng: "Tree Pose", cat: "standing", chakra: "Ajna (Third Eye)", img: "images/vrikshasana.jpg", benefit: "Develops laser drishti focus, strengthens ankles, stretches inner groins and cultivates poise." },
-        { id: "trikonasana", name: "Utthita Trikonasana", dev: "उत्थित त्रिकोणासन", eng: "Extended Triangle", cat: "standing", chakra: "Manipura", img: "images/trikonasana.jpg", benefit: "Spacious lateral spinal stretch, expands chest capacity and relieves hamstring tightness." },
-        { id: "virabhadrasana2", name: "Virabhadrasana II", dev: "वीरभद्रासन २", eng: "Warrior II", cat: "standing", chakra: "Muladhara & Manipura", img: "images/virabhadrasana2.jpg", benefit: "Fosters heroic stamina, opens hips, strengthens quadriceps and builds unshakable resolve." },
-        { id: "adho_mukha_svanasana", name: "Adho Mukha Svanasana", dev: "अधोमुख श्वानासन", eng: "Downward-Facing Dog", cat: "inversion", chakra: "Vishuddha & Ajna", img: "images/adho_mukha_svanasana.jpg", benefit: "Decompresses vertebral discs, calms nervous system and energizes the entire body." },
-        { id: "bhujangasana", name: "Bhujangasana", dev: "भुजङ्गासन", eng: "Cobra Pose", cat: "backbend", chakra: "Anahata (Heart)", img: "images/bhujangasana.jpg", benefit: "Invigorates the heart, expands lung volume, strengthens spine and stimulates digestive agni." },
-        { id: "balasana", name: "Balasana", dev: "बालासन", eng: "Child's Pose", cat: "restorative", chakra: "Ajna", img: "images/balasana.jpg", benefit: "Sacred surrender posture, massages abdominal organs, calms adrenal fatigue and relieves stress." },
-        { id: "chakrasana", name: "Chakrasana", dev: "चक्रासन", eng: "Wheel Pose", cat: "backbend", chakra: "All 7 Chakras", img: "images/chakrasana.jpg", benefit: "Profound spine rejuvenation, tones thyroid, expands cardiovascular vitality and dispels lethargy." },
-        { id: "sirsasana", name: "Salamba Sirsasana", dev: "सालम्ब शीर्षासन", eng: "Headstand (King of Poses)", cat: "inversion", chakra: "Sahasrara", img: "images/sirsasana.jpg", benefit: "Increases cerebral blood supply, revitalizes pituitary and pineal glands, cultivates courage." },
-        { id: "viparita_karani", name: "Viparita Karani", dev: "विपरीतकरणी", eng: "Legs-Up-The-Wall", cat: "restorative", chakra: "Vishuddha", img: "images/viparita_karani.jpg", benefit: "Deep restorative relief for tired legs, lymphatic drainage, facilitates profound sleep." }
+        { id: "padmasana", name: "Padmasana", dev: "பத்மாசனம்", eng: "Lotus Pose", cat: "seated", chakra: "Sahasrara & Muladhara", img: "images/padmasana.jpg", benefit: "Classical posture for pranayama, stabilizes pelvis, calms mind and directs prana up sushumna." },
+        { id: "vrikshasana", name: "Vrikshasana", dev: "விருக்ஷாசனம்", eng: "Tree Pose", cat: "standing", chakra: "Ajna (Third Eye)", img: "images/vrikshasana.jpg", benefit: "Develops laser drishti focus, strengthens ankles, stretches inner groins and cultivates poise." },
+        { id: "trikonasana", name: "Utthita Trikonasana", dev: "உத்தித திரிகோணாசனம்", eng: "Extended Triangle", cat: "standing", chakra: "Manipura", img: "images/trikonasana.jpg", benefit: "Spacious lateral spinal stretch, expands chest capacity and relieves hamstring tightness." },
+        { id: "virabhadrasana2", name: "Virabhadrasana II", dev: "வீரபத்ராசனம் 2", eng: "Warrior II", cat: "standing", chakra: "Muladhara & Manipura", img: "images/virabhadrasana2.jpg", benefit: "Fosters heroic stamina, opens hips, strengthens quadriceps and builds unshakable resolve." },
+        { id: "adho_mukha_svanasana", name: "Adho Mukha Svanasana", dev: "அதோ முக ஸ்வானாசனம்", eng: "Downward-Facing Dog", cat: "inversion", chakra: "Vishuddha & Ajna", img: "images/adho_mukha_svanasana.jpg", benefit: "Decompresses vertebral discs, calms nervous system and energizes the entire body." },
+        { id: "bhujangasana", name: "Bhujangasana", dev: "புஜங்காசனம்", eng: "Cobra Pose", cat: "backbend", chakra: "Anahata (Heart)", img: "images/bhujangasana.jpg", benefit: "Invigorates the heart, expands lung volume, strengthens spine and stimulates digestive agni." },
+        { id: "balasana", name: "Balasana", dev: "பாலாசனம்", eng: "Child's Pose", cat: "restorative", chakra: "Ajna", img: "images/balasana.jpg", benefit: "Sacred surrender posture, massages abdominal organs, calms adrenal fatigue and relieves stress." },
+        { id: "chakrasana", name: "Chakrasana", dev: "சக்ராசனம்", eng: "Wheel Pose", cat: "backbend", chakra: "All 7 Chakras", img: "images/chakrasana.jpg", benefit: "Profound spine rejuvenation, tones thyroid, expands cardiovascular vitality and dispels lethargy." },
+        { id: "sirsasana", name: "Salamba Sirsasana", dev: "சாலாம்ப சீர்ஷாசனம்", eng: "Headstand (King of Poses)", cat: "inversion", chakra: "Sahasrara", img: "images/sirsasana.jpg", benefit: "Increases cerebral blood supply, revitalizes pituitary and pineal glands, cultivates courage." },
+        { id: "viparita_karani", name: "Viparita Karani", dev: "விபரீத கரணி", eng: "Legs-Up-The-Wall", cat: "restorative", chakra: "Vishuddha", img: "images/viparita_karani.jpg", benefit: "Deep restorative relief for tired legs, lymphatic drainage, facilitates profound sleep." }
     ];
 
     let activeAsanaFilter = "all";
