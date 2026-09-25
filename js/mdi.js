@@ -461,6 +461,13 @@
        4. QUICK PRANA BREATH ENGINE (In-Dashboard Interactive Orb)
        ========================================================================== */
     const QUICK_PATTERNS = {
+        "4-6": {
+            name: "4–6 Deep Relaxation (Your Primary Daily Breath)",
+            ratio: [4, 0, 6, 0],
+            desc: "★ Your Primary Daily Practice: 4s Inhale and extended 6s Exhale triggers immediate vagus nerve activation, lowers heart rate, and melts mental fatigue.",
+            color: "var(--accent-cyan)",
+            glow: "rgba(38, 165, 184, 0.55)"
+        },
         "box": {
             name: "Sama Vritti (Box 4-4-4-4)",
             ratio: [4, 4, 4, 4],
@@ -494,7 +501,7 @@
     let quickBreathState = {
         isRunning: false,
         timer: null,
-        patternKey: "box",
+        patternKey: "4-6",
         phaseIndex: 0, // 0: inhale, 1: hold full, 2: exhale, 3: hold empty
         phaseTimeRemaining: 4,
         cyclesCompleted: 0,
@@ -1582,6 +1589,20 @@
         audio: audio,
         setQuickPattern: setQuickPattern,
         toggleQuickBreath: toggleQuickBreath,
+        start46Breathing: () => {
+            setQuickPattern("4-6");
+            document.querySelectorAll(".quick-pattern-pill").forEach(p => {
+                p.classList.toggle("active", p.getAttribute("data-pattern") === "4-6");
+            });
+            const section = document.getElementById("quickBreathSection");
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (!quickBreathState.isRunning) {
+                startQuickBreath();
+            }
+            showNotificationToast("🌊 4–6 Deep Relaxation Breathwork Activated (Inhale 4s • Exhale 6s)");
+        },
         openMdiWorkspace: openMdiWorkspace,
         closeMdiWorkspace: closeMdiWorkspace,
         launchRoutineModal: launchRoutineModal,

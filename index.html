@@ -1324,6 +1324,9 @@
             <span id="realtimeClock">Loading Clock...</span>
         </div>
         <div class="nav-actions-right">
+            <button class="icon-btn primary" onclick="window.PranaMDI.start46Breathing()" title="Start 4-6 Relaxation Practice Instantly">
+                🌊 4–6 Daily Breath
+            </button>
             <button id="mdiModeToggleBtn" class="icon-btn" title="Launch Multi-Document Workspace">
                 🖥️ MDI Multi-Studio
             </button>
@@ -1344,7 +1347,10 @@
 
         <!-- SUB NAV SHORTCUTS -->
         <div class="sub-nav-bar">
-            <a href="Breathing_Exercise.html" class="icon-btn primary" title="Open Dedicated Pranayama Studio">
+            <button class="icon-btn primary" onclick="window.PranaMDI.start46Breathing()" title="Start 4-6 Relaxation Practice Instantly" style="box-shadow: 0 4px 14px rgba(38, 165, 184, 0.4);">
+                🌊 4–6 Relaxation (Primary Core)
+            </button>
+            <a href="Breathing_Exercise.html" class="icon-btn" title="Open Dedicated Pranayama Studio">
                 🌬️ Pranayama Studio
             </a>
             <a href="Asanas.html" class="icon-btn gold" title="Open Dedicated Yoga Asana Studio">
@@ -1416,6 +1422,17 @@
                     <p><b>✨ Current Energy Phase:</b> <span id="muhurtaEnergy">Supreme Sattva</span> • <span id="muhurtaSanskrit">பிரம்ம முஹூர்த்தம்</span></p>
                     <p style="margin-top: 4px;"><b>🎯 Recommended Sadhana:</b> <span id="muhurtaRec">Surya Namaskar 12-Flow, Kapalabhati, Bhastrika & Chest-opening Asanas.</span></p>
                 </div>
+                <!-- 4-6 PRIMARY PRACTICE SPOTLIGHT -->
+                <div style="margin-top: 12px; padding: 12px 16px; background: rgba(38, 165, 184, 0.12); border: 1px solid var(--accent-cyan); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--accent-cyan); letter-spacing: 0.8px;">★ Your Primary Daily Practice</div>
+                        <div style="font-size: 14.5px; font-weight: 700; color: var(--text-primary);">4–6 Deep Relaxation Breathwork</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">4s Inhale • 6s Exhale (Vagus Nerve Stimulation & Heart Rate Reset)</div>
+                    </div>
+                    <button class="icon-btn primary" onclick="window.PranaMDI.start46Breathing()" style="box-shadow: 0 4px 14px rgba(38, 165, 184, 0.4);">
+                        ▶️ Start 4–6 Practice
+                    </button>
+                </div>
             </div>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1471,11 +1488,14 @@
                     </div>
                 </div>
                 <div class="chamber-actions">
-                    <a href="Breathing_Exercise.html" class="icon-btn primary" title="Open Dedicated Page">
-                        Open Studio ↗
+                    <button class="icon-btn primary" onclick="window.PranaMDI.start46Breathing()" title="Start 4-6 Relaxation Practice Instantly">
+                        ▶ 4–6 Daily Breath
+                    </button>
+                    <a href="Breathing_Exercise.html" class="icon-btn" title="Open Dedicated Page">
+                        Studio ↗
                     </a>
                     <button class="icon-btn" data-launch-mdi="pranayama" title="Launch in MDI Dock">
-                        Dock in MDI ⧉
+                        Dock ⧉
                     </button>
                 </div>
             </div>
@@ -1556,11 +1576,18 @@
                 <div>
                     <h3 style="font-family: 'Cinzel', serif; font-size: 18px; margin-bottom: 6px;">Select Breathwork Rhythm</h3>
                     <p id="quickPatternDesc" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 16px;">
-                        Equal balancing of parasympathetic and sympathetic nervous systems.
+                        ★ Your Primary Daily Practice: 4s Inhale and extended 6s Exhale triggers immediate vagus nerve activation, lowers heart rate, and melts mental fatigue.
                     </p>
 
                     <div class="quick-patterns-list">
-                        <button class="quick-pattern-pill active" data-pattern="box">
+                        <button class="quick-pattern-pill active" data-pattern="4-6" style="border-color: var(--accent-cyan); background: rgba(38, 165, 184, 0.15); grid-column: span 2;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <b>🌊 4–6 Deep Relaxation</b>
+                                <span style="font-size: 10px; font-weight: 800; background: var(--accent-cyan); color: #fff; padding: 2px 7px; border-radius: 10px;">★ YOUR DAILY PRACTICE</span>
+                            </div>
+                            <small style="display:block; margin-top:3px; color: var(--text-secondary);">4s Inhale • 6s Exhale (Vagus Nerve & Parasympathetic Activation)</small>
+                        </button>
+                        <button class="quick-pattern-pill" data-pattern="box">
                             <b>📦 Box (4-4-4-4)</b><br><small>Focus & Balance</small>
                         </button>
                         <button class="quick-pattern-pill" data-pattern="4-7-8">
@@ -1576,7 +1603,7 @@
 
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                         <button id="quickBreathBtn" class="icon-btn primary" style="padding: 12px 22px; font-size: 14px;">
-                            ▶️ Start Breathing
+                            ▶️ Start 4–6 Breathing
                         </button>
                         <a href="Breathing_Exercise.html" class="icon-btn" title="Open Full Breathwork Studio with Voice Guidance & Zen Mode">
                             🌬️ Full Pranayama Studio ↗
