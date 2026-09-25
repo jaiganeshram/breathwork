@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#172428">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/padmasana.jpg">
     <title>Yoga Asana Studio & Sacred Posture Guide – PranaVeda</title>
     
     <!-- Google Fonts -->
@@ -1338,8 +1344,12 @@
 </div>
 
 <!-- ==========================================================================
-     JAVASCRIPT LOGIC & ASANA DATA
+     FIREBASE & JAVASCRIPT LOGIC
      ========================================================================== -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-sync.js"></script>
 <script src="js/asanas.js"></script>
 
 </body>

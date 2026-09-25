@@ -1627,6 +1627,9 @@ function toggleFavorite(e, id) {
         favorites.push(id);
     }
     localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favorites));
+    if (window.PranaFirebase) {
+        window.PranaFirebase.saveAsanaFavorites(favorites);
+    }
     renderAsanas();
 }
 

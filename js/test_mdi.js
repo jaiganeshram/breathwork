@@ -48,7 +48,10 @@ const requiredIds = [
     'mdiIframePrimary',
     'mdiIframeSecondary',
     'journalTableBody',
-    'themeToggleBtn'
+    'themeToggleBtn',
+    'firebaseSyncBadge',
+    'firebaseAuthBtn',
+    'firebaseModal'
 ];
 
 let missingIds = [];

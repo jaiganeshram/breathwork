@@ -981,6 +981,13 @@ saveRatingBtn.addEventListener("click", () => {
         const sessions = getSessions();
         sessions.push(pendingSession);
         localStorage.setItem("breathingSessions", JSON.stringify(sessions));
+        if (window.PranaFirebase) {
+            window.PranaFirebase.saveSession({
+                pattern: pendingSession.pattern || "4-6 Deep Relaxation",
+                duration: pendingSession.duration || 60,
+                type: "Pranayama"
+            });
+        }
         pendingSession = null;
         selectedRating = null;
     }

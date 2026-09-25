@@ -1,0 +1,24 @@
+{
+  "name": "PranaVeda – Sacred Breathwork & Yoga Studio",
+  "short_name": "PranaVeda",
+  "description": "Vedic Pranayama 4-6 Breathwork, 35 Classical Yoga Asanas, Surya Namaskar, Solfeggio Sound Bath & Cloud Sadhana Tracker.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#172428",
+  "theme_color": "#172428",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/padmasana.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/padmasana.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

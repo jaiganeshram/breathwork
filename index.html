@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#172428">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PranaVeda">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/padmasana.jpg">
     <title>PranaVeda – Master MDI Portal & Sacred Wellness Hub</title>
     <meta name="description" content="Master Document Interface (MDI) for PranaVeda. Sacred Pranayama Breathwork, 35 Classical Yoga Asanas, Surya Namaskar, Solfeggio Sound Bath, and Vedic Sadhana Flows.">
 
@@ -272,6 +279,35 @@
             background: var(--accent-cyan);
             color: #ffffff;
             border-color: var(--accent-cyan);
+        }
+
+        /* CLOUD SYNC BADGE */
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(38, 165, 184, 0.1);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .sync-badge.synced {
+            background: rgba(46, 168, 121, 0.12);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 10px rgba(46, 168, 121, 0.2);
+        }
+
+        .sync-badge.offline {
+            background: rgba(229, 169, 60, 0.12);
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
         }
 
         /* ==========================================================================
@@ -1300,13 +1336,99 @@
         /* FOOTER */
         footer {
             text-align: center;
-            padding: 30px 10px;
+            padding: 30px 10px 40px 10px;
             color: var(--text-muted);
             font-size: 13px;
             line-height: 1.6;
         }
 
         footer b { color: var(--text-primary); }
+
+        /* ==========================================================================
+           MOBILE THUMB-FRIENDLY BOTTOM NAVIGATION & RESPONSIVE POLISH
+           ========================================================================== */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(16, 25, 28, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 12px)) 12px;
+            z-index: 9999;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.4);
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-item:active {
+            transform: scale(0.92);
+        }
+
+        .mobile-nav-item.highlight-46 {
+            color: var(--accent-cyan);
+            transform: translateY(-6px);
+        }
+
+        .mobile-nav-item.highlight-46 .mobile-nav-icon {
+            background: linear-gradient(135deg, var(--accent-cyan), #1e8392);
+            color: #ffffff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 16px var(--accent-glow);
+            border: 2px solid rgba(255,255,255,0.25);
+        }
+
+        .mobile-nav-icon {
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 10px calc(85px + env(safe-area-inset-bottom, 18px)) 10px;
+            }
+            .mobile-bottom-nav {
+                display: flex;
+            }
+            h1 { font-size: 26px; }
+            .hero-banner { padding: 18px 14px; grid-template-columns: 1fr; gap: 16px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .card { padding: 18px 14px; border-radius: var(--radius-lg); margin-bottom: 18px; }
+            .breath-orb-container { width: 190px; height: 190px; }
+            .breath-orb { width: 115px; height: 115px; }
+            .quick-patterns-list { grid-template-columns: 1fr; }
+            .quick-pattern-pill { grid-column: span 1 !important; }
+            .chakra-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .asana-gallery-grid { grid-template-columns: 1fr; }
+            .header-top-row { flex-direction: column; align-items: stretch; text-align: center; }
+            .nav-actions-right { justify-content: center; }
+            .modal-content { padding: 20px 16px; width: 95%; max-height: 85vh; border-radius: var(--radius-lg); }
+        }
     </style>
 </head>
 <body>
@@ -1324,6 +1446,12 @@
             <span id="realtimeClock">Loading Clock...</span>
         </div>
         <div class="nav-actions-right">
+            <span id="firebaseSyncBadge" class="sync-badge offline" title="Cloud Sync Status: Active Offline Persistence">
+                🟡 Local Cache
+            </span>
+            <button id="firebaseAuthBtn" class="icon-btn" onclick="openFirebaseModal()" title="Firebase Cloud Sync & Account">
+                ☁️ Cloud Sync
+            </button>
             <button class="icon-btn primary" onclick="window.PranaMDI.start46Breathing()" title="Start 4-6 Relaxation Practice Instantly">
                 🌊 4–6 Daily Breath
             </button>
@@ -1784,8 +1912,129 @@
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- FIREBASE CLOUD SYNC & SETTINGS MODAL -->
+<div id="firebaseModal" class="modal">
+    <div class="modal-content" style="max-width: 560px;">
+        <button class="modal-close-btn" onclick="closeFirebaseModal()" title="Close">✕</button>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <span style="font-size:32px;">☁️</span>
+            <div>
+                <h3 style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;">Firebase Cloud Firestore Sync</h3>
+                <p style="font-size: 12.5px; color: var(--text-secondary);">Replace local-only storage with persistent Cloud Sync across Phone, Tablet & PC</p>
+            </div>
+        </div>
+
+        <!-- Live Status Card -->
+        <div style="background: var(--card-bg-subtle); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Cloud Connection</span>
+                <span id="modalAuthStatus" class="pill pill-gold" style="font-size:11px;">Active Offline Persistence</span>
+            </div>
+            <div style="font-size:13.5px; font-weight:600;" id="modalUserDisplay">Storage Mode: Local Cache & Cloud Ready</div>
+            <p style="font-size:12px; color:var(--text-secondary); margin-top:6px; line-height: 1.4;">
+                All 4–6 breathing records, streaks, and saved asanas are backed up in real-time with offline-first persistence.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+            <button class="icon-btn primary" onclick="window.PranaFirebase.signInWithGoogle()" style="justify-content:center; padding:12px; font-size:13.5px;">
+                🌐 Sign in with Google (Cross-Device Sync)
+            </button>
+            <button class="icon-btn" onclick="window.PranaFirebase.migrateLocalDataToFirestore()" style="justify-content:center; padding:10px; font-size:13px;">
+                🔄 Upload Offline History to Cloud Firestore
+            </button>
+        </div>
+
+        <!-- Custom Firebase Config Details (Expandable) -->
+        <details style="border-top:1px dashed var(--card-border); padding-top:12px; font-size:12.5px; color:var(--text-secondary);">
+            <summary style="cursor:pointer; font-weight:700; color:var(--accent-cyan); margin-bottom:10px;">
+                ⚙️ Custom Firebase Project Credentials (Optional)
+            </summary>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <div>
+                    <label style="font-size:11px; font-weight:700;">API KEY</label>
+                    <input type="text" id="fbInputApiKey" placeholder="AIzaSy..." style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--text-primary); font-size:12px;">
+                </div>
+                <div>
+                    <label style="font-size:11px; font-weight:700;">PROJECT ID</label>
+                    <input type="text" id="fbInputProjectId" placeholder="pranaveda-wellness" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--card-border); background:var(--card-bg); color:var(--text-primary); font-size:12px;">
+                </div>
+                <button class="icon-btn small gold" onclick="saveCustomFirebaseConfig()" style="align-self:flex-start; margin-top:4px;">
+                    💾 Save & Connect Custom Project
+                </button>
+            </div>
+        </details>
+    </div>
+</div>
+
+<!-- SCRIPTS: FIREBASE COMPAT & MASTER MDI -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-sync.js"></script>
 <script src="js/mdi.js"></script>
+
+<script>
+function openFirebaseModal() {
+    const modal = document.getElementById("firebaseModal");
+    if (modal) {
+        modal.classList.add("show");
+        const user = window.PranaFirebase ? window.PranaFirebase.currentUser : null;
+        const statusEl = document.getElementById("modalAuthStatus");
+        const displayEl = document.getElementById("modalUserDisplay");
+        if (user && !user.isAnonymous) {
+            if (statusEl) { statusEl.className = "pill pill-green"; statusEl.textContent = "Google Synced"; }
+            if (displayEl) displayEl.textContent = `User: ${user.displayName || user.email}`;
+        } else if (user) {
+            if (statusEl) { statusEl.className = "pill pill-gold"; statusEl.textContent = "Anonymous Cloud ID"; }
+            if (displayEl) displayEl.textContent = `UID: ${user.uid.substring(0, 14)}...`;
+        }
+    }
+}
+function closeFirebaseModal() {
+    const modal = document.getElementById("firebaseModal");
+    if (modal) modal.classList.remove("show");
+}
+function saveCustomFirebaseConfig() {
+    const apiKey = document.getElementById("fbInputApiKey").value.trim();
+    const projectId = document.getElementById("fbInputProjectId").value.trim();
+    if (!apiKey || !projectId) {
+        alert("Please provide at least API Key and Project ID.");
+        return;
+    }
+    if (window.PranaFirebase) {
+        window.PranaFirebase.saveConfig({ apiKey, projectId, authDomain: `${projectId}.firebaseapp.com` });
+        alert("Custom Firebase configuration saved. Reloading page to connect...");
+        window.location.reload();
+    }
+}
+</script>
+
+<!-- MOBILE THUMB-FRIENDLY BOTTOM NAVIGATION BAR -->
+<nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-item" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <span class="mobile-nav-icon">🏛️</span>
+        <span>Hub</span>
+    </button>
+    <a href="Breathing_Exercise.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🌬️</span>
+        <span>Prana</span>
+    </a>
+    <button class="mobile-nav-item highlight-46" onclick="window.PranaMDI.start46Breathing()" title="Start 4-6 Practice">
+        <div class="mobile-nav-icon">🌊</div>
+        <span>4–6 Breath</span>
+    </button>
+    <a href="Asanas.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🧘</span>
+        <span>Asanas</span>
+    </a>
+    <button class="mobile-nav-item" onclick="openFirebaseModal()">
+        <span class="mobile-nav-icon">☁️</span>
+        <span>Sync</span>
+    </button>
+</nav>
 
 </body>
 </html>

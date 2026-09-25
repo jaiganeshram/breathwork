@@ -460,6 +460,34 @@
     /* ==========================================================================
        4. QUICK PRANA BREATH ENGINE (In-Dashboard Interactive Orb)
        ========================================================================== */
+    let wakeLock = null;
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch (e) {
+                // Ignore wakeLock errors on unsupported browsers
+            }
+        }
+    }
+    function releaseWakeLock() {
+        if (wakeLock) {
+            try { wakeLock.release(); } catch(e){}
+            wakeLock = null;
+        }
+    }
+
+    function triggerHaptic(type = "phase") {
+        if ("vibrate" in navigator) {
+            try {
+                if (type === "inhale") navigator.vibrate([45]);
+                else if (type === "exhale") navigator.vibrate([85]);
+                else if (type === "hold") navigator.vibrate([25, 40, 25]);
+                else navigator.vibrate([40]);
+            } catch (e) {}
+        }
+    }
+
     const QUICK_PATTERNS = {
         "4-6": {
             name: "4–6 Deep Relaxation (Your Primary Daily Breath)",
@@ -535,6 +563,7 @@
 
     function startQuickBreath() {
         audio.init();
+        requestWakeLock();
         quickBreathState.isRunning = true;
         quickBreathState.sessionStartTime = Date.now();
         quickBreathState.cyclesCompleted = 0;
@@ -551,6 +580,7 @@
         }
 
         audio.playBell(432, 2.5, "bowl");
+        triggerHaptic("inhale");
         updateQuickBreathVisuals();
 
         quickBreathState.timer = setInterval(tickQuickBreath, 1000);
@@ -581,10 +611,18 @@
             quickBreathState.phaseIndex = nextPhase;
             quickBreathState.phaseTimeRemaining = pat.ratio[nextPhase];
 
-            // Sound cue for phase change
-            if (nextPhase === 0) audio.playBell(528, 2.5, "bowl"); // Inhale
-            else if (nextPhase === 2) audio.playBell(396, 2.5, "bowl"); // Exhale
-            else audio.playBell(432, 1.5, "ting-sha"); // Holds
+            // Sound cue & haptic vibration for phase change
+            // Sound cue & haptic vibration for phase change
+            if (nextPhase === 0) {
+                audio.playBell(528, 2.5, "bowl"); // Inhale
+                triggerHaptic("inhale");
+            } else if (nextPhase === 2) {
+                audio.playBell(396, 2.5, "bowl"); // Exhale
+                triggerHaptic("exhale");
+            } else {
+                audio.playBell(432, 1.5, "ting-sha"); // Holds
+                triggerHaptic("hold");
+            }
         }
 
         updateQuickBreathVisuals();
@@ -633,6 +671,7 @@
 
     function stopQuickBreath() {
         if (!quickBreathState.isRunning) return;
+        releaseWakeLock();
         quickBreathState.isRunning = false;
         clearInterval(quickBreathState.timer);
         quickBreathState.timer = null;
@@ -1383,6 +1422,20 @@
             });
             localStorage.setItem("breathingSessions", JSON.stringify(breathSessions.slice(0, 100)));
 
+            // Sync to Firebase Cloud Firestore
+            if (window.PranaFirebase) {
+                window.PranaFirebase.saveSession({
+                    pattern: title,
+                    duration: durationMin * 60,
+                    type: category
+                });
+                window.PranaFirebase.saveSadhanaLog({
+                    title: title,
+                    duration: durationMin,
+                    category: category
+                });
+            }
+
             updateSadhanaStatsUI();
         } catch (err) {
             console.error("Session log error:", err);
@@ -1603,6 +1656,7 @@
             }
             showNotificationToast("🌊 4–6 Deep Relaxation Breathwork Activated (Inhale 4s • Exhale 6s)");
         },
+        updateStats: updateSadhanaStatsUI,
         openMdiWorkspace: openMdiWorkspace,
         closeMdiWorkspace: closeMdiWorkspace,
         launchRoutineModal: launchRoutineModal,
