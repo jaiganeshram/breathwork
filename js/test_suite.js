@@ -10,7 +10,7 @@ const ids = [
     'startBtn', 'pauseBtn', 'resetBtn', 'mindBtn',
     'ratingModal', 'saveRatingBtn', 'guideModal', 'guideBtn', 'closeGuideBtn',
     'zenBtn', 'zenExitBtn', 'themeBtn', 'fullscreenBtn',
-    'history', 'historyActions', 'toggleAllGroupsBtn', 'clearHistoryBtn', 'exportCsvBtn',
+    'history', 'historyActions', 'refreshHistoryBtn', 'toggleAllGroupsBtn', 'clearHistoryBtn', 'exportCsvBtn',
     'todaySessions', 'totalMinutes', 'totalSessions', 'avgCalm', 'totalWanders', 'streakBadge',
     'badge1', 'badge2', 'badge3', 'badge4', 'badge5',
     'firebaseModal', 'modalAuthStatus', 'fbInputSmartPaste', 'firebaseSyncBadge', 'firebaseAuthBtn'

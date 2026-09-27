@@ -612,7 +612,6 @@
             quickBreathState.phaseTimeRemaining = pat.ratio[nextPhase];
 
             // Sound cue & haptic vibration for phase change
-            // Sound cue & haptic vibration for phase change
             if (nextPhase === 0) {
                 audio.playBell(528, 2.5, "bowl"); // Inhale
                 triggerHaptic("inhale");

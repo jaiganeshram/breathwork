@@ -243,6 +243,7 @@ const fullscreenBtn = document.getElementById("fullscreenBtn");
 
 const historyDiv = document.getElementById("history");
 const historyActions = document.getElementById("historyActions");
+const refreshHistoryBtn = document.getElementById("refreshHistoryBtn");
 const toggleAllGroupsBtn = document.getElementById("toggleAllGroupsBtn");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
@@ -913,20 +914,6 @@ function recordPranayamaSession(data) {
 }
 window.recordPranayamaSession = recordPranayamaSession;
 
-window.logQuickSession = function(mins = 10, technique = "4-6") {
-    const rec = recordPranayamaSession({
-        pattern: technique,
-        duration: mins,
-        cycles: Math.max(1, Math.round((mins * 60) / 10)),
-        mindWanders: 0,
-        rating: 5
-    });
-    if (typeof window.showNotificationToast === "function") {
-        window.showNotificationToast(`🪷 Logged ${mins}m 4–6 Practice Session!`);
-    }
-    return rec;
-};
-
 function pauseSession() {
     if (!running) return;
     running = false;
@@ -1271,21 +1258,25 @@ function loadStats() {
 
     // History Table
     if (!sessions.length) {
-        historyActions.style.display = "none";
         historyDiv.innerHTML = `
             <div class="empty-history">
                 <div class="empty-history-icon">🍃</div>
-                <div style="font-weight: 600; margin-bottom: 4px;">No sessions recorded yet.</div>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Start your 4–6 Pranayama practice above or log your session below!</div>
-                <button class="btn btn-primary" onclick="window.logQuickSession(10, '4-6')" style="font-size: 13px; padding: 8px 18px; margin: 0 auto; display: inline-flex; align-items: center; gap: 6px;">
-                    ➕ Log 10m 4–6 Practice
-                </button>
+                <div>No sessions recorded yet. Begin your first Pranayama practice above!</div>
             </div>
         `;
+        if (historyActions) historyActions.style.display = "flex";
+        if (refreshHistoryBtn) refreshHistoryBtn.style.display = "inline-flex";
+        if (toggleAllGroupsBtn) toggleAllGroupsBtn.style.display = "none";
+        if (exportCsvBtn) exportCsvBtn.style.display = "none";
+        if (clearHistoryBtn) clearHistoryBtn.style.display = "none";
         return;
     }
 
-    historyActions.style.display = "flex";
+    if (historyActions) historyActions.style.display = "flex";
+    if (refreshHistoryBtn) refreshHistoryBtn.style.display = "inline-flex";
+    if (toggleAllGroupsBtn) toggleAllGroupsBtn.style.display = "inline-flex";
+    if (exportCsvBtn) exportCsvBtn.style.display = "inline-flex";
+    if (clearHistoryBtn) clearHistoryBtn.style.display = "inline-flex";
 
     // Map each session with originalIndex so deletions reference exact index
     const sessionsWithIndex = sessions.map((s, idx) => ({ ...s, originalIndex: idx }));
@@ -1487,6 +1478,19 @@ window.deleteSession = function(index) {
         loadStats();
     }
 };
+
+if (refreshHistoryBtn) {
+    refreshHistoryBtn.addEventListener("click", () => {
+        loadStats();
+        if (window.PranaFirebase && window.PranaFirebase.db) {
+            const uid = window.PranaFirebase.currentUser ? window.PranaFirebase.currentUser.uid : window.PranaFirebase.getClientUid();
+            window.PranaFirebase.attachRealtimeListeners(uid);
+        }
+        if (typeof window.showNotificationToast === "function") {
+            window.showNotificationToast("🔄 History Refreshed");
+        }
+    });
+}
 
 clearHistoryBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to clear your entire Pranayama history?")) {

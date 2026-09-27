@@ -1511,17 +1511,17 @@
     <div class="card">
         <div class="card-header">
             <div class="card-title">📝 Session History</div>
-            <div class="history-actions" id="historyActions" style="display: none; gap: 8px;">
-                <button id="quickLogHeaderBtn" class="icon-btn" onclick="window.logQuickSession(10, '4-6')" title="Quick log a 10m 4-6 Pranayama practice">
-                    ➕ Log Practice
+            <div class="history-actions" id="historyActions" style="display: flex; gap: 8px;">
+                <button id="refreshHistoryBtn" class="icon-btn" title="Refresh Session History">
+                    🔄 Refresh
                 </button>
-                <button id="toggleAllGroupsBtn" class="icon-btn" title="Expand or Collapse All Dates">
+                <button id="toggleAllGroupsBtn" class="icon-btn" style="display: none;" title="Expand or Collapse All Dates">
                     ⮟ Collapse All
                 </button>
-                <button id="exportCsvBtn" class="icon-btn" title="Export History as CSV">
+                <button id="exportCsvBtn" class="icon-btn" style="display: none;" title="Export History as CSV">
                     📥 Export CSV
                 </button>
-                <button id="clearHistoryBtn" class="icon-btn btn-danger" title="Clear all history">
+                <button id="clearHistoryBtn" class="icon-btn btn-danger" style="display: none;" title="Clear all history">
                     🗑️ Clear All
                 </button>
             </div>
@@ -1530,11 +1530,7 @@
         <div id="history">
             <div class="empty-history">
                 <div class="empty-history-icon">🍃</div>
-                <div style="font-weight: 600; margin-bottom: 4px;">No sessions recorded yet.</div>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Start your 4–6 Pranayama practice above or log your session below!</div>
-                <button class="btn btn-primary" onclick="window.logQuickSession(10, '4-6')" style="font-size: 13px; padding: 8px 18px; margin: 0 auto; display: inline-flex; align-items: center; gap: 6px;">
-                    ➕ Log 10m 4–6 Practice
-                </button>
+                <div>No sessions recorded yet. Begin your first Pranayama practice above!</div>
             </div>
         </div>
     </div>
@@ -1764,11 +1760,8 @@
         </div>
 
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-            <button class="icon-btn" onclick="window.logQuickSession(10, '4-6'); alert('Logged 10m 4-6 session to Local & Cloud History!');">
-                ⚡ Log 10m Test Session
-            </button>
             <button class="icon-btn" onclick="if(window.PranaFirebase) window.PranaFirebase.migrateLocalDataToFirestore();">
-                🔄 Sync All Local to Cloud
+                🔄 Sync Local to Cloud Now
             </button>
             <button class="icon-btn" onclick="window.open('https://console.firebase.google.com/project/breathwork-c5371/firestore', '_blank')">
                 🔗 Open Firestore Console
