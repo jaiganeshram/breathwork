@@ -263,18 +263,15 @@
             }
         }
 
-        /* ==========================================================================
-           FIRESTORE CRUD: SESSIONS & SADHANA LOGS
-           ========================================================================== */
         async saveSession(sessionData) {
             const patternName = sessionData.pattern || "4–6 Relaxation (Primary)";
             const durationMin = Number(sessionData.duration) || 1;
             const cyclesCount = Number(sessionData.cycles) || 0;
             const mindCount = Number(sessionData.mindWanders) || 0;
             const ratingVal = Number(sessionData.rating) || 5;
-            const nowIso = new Date().toISOString();
-            const clientDate = new Date().toLocaleDateString();
-            const clientTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const nowIso = sessionData.date || new Date().toISOString();
+            const clientDate = sessionData.clientDate || new Date().toLocaleDateString();
+            const clientTime = sessionData.clientTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
 
             const entry = {
@@ -294,20 +291,25 @@
                 type: sessionData.type || "Pranayama"
             };
 
-            // 1. Always save to localStorage immediately for instant offline reliability
+            // 1. Always update localStorage safely (deduplicate by date)
             try {
                 if (typeof localStorage !== "undefined") {
                     const local = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
-                    local.unshift({
-                        pattern: entry.pattern,
-                        duration: entry.duration,
-                        cycles: entry.cycles,
-                        mindWanders: entry.mindWanders,
-                        rating: entry.rating,
-                        date: entry.date,
-                        clientDate: entry.clientDate,
-                        clientTime: entry.clientTime
-                    });
+                    const idx = local.findIndex(s => s.date === entry.date);
+                    if (idx >= 0) {
+                        local[idx] = { ...local[idx], ...entry };
+                    } else {
+                        local.unshift({
+                            pattern: entry.pattern,
+                            duration: entry.duration,
+                            cycles: entry.cycles,
+                            mindWanders: entry.mindWanders,
+                            rating: entry.rating,
+                            date: entry.date,
+                            clientDate: entry.clientDate,
+                            clientTime: entry.clientTime
+                        });
+                    }
                     localStorage.setItem("breathingSessions", JSON.stringify(local.slice(0, 150)));
                 }
             } catch (e) {}
@@ -315,20 +317,18 @@
             // 2. Save to Firestore via SDK
             if (this.db) {
                 try {
-                    // Save to user sub-collection
                     this.db.collection("users")
                         .doc(uid)
                         .collection("breathingSessions")
                         .add(entry)
                         .then(() => {
-                            console.log("☁️ [Firebase] 4-6 Session saved to Firestore (breathwork-c5371)!");
+                            console.log("☁️ [Firebase] Session saved to Firestore (breathwork-c5371)!");
                             if (typeof window !== "undefined" && window.showNotificationToast) {
                                 window.showNotificationToast("☁️ 4–6 Practice Saved to Firebase History!");
                             }
                         })
                         .catch((err) => {
-                            console.warn("Firestore user doc write notice:", err.message);
-                            // Fallback to top-level collection
+                            console.warn("Firestore write notice:", err.message);
                             this.db.collection("breathingSessions").add(entry).catch(() => {});
                         });
                 } catch (err) {
@@ -452,8 +452,21 @@
                             });
                         });
 
-                        if (cloudSessions.length > 0 && typeof localStorage !== "undefined") {
-                            localStorage.setItem("breathingSessions", JSON.stringify(cloudSessions));
+                        if (typeof localStorage !== "undefined") {
+                            const localSessions = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
+                            const merged = [...cloudSessions];
+                            localSessions.forEach(localS => {
+                                const exists = merged.some(cloudS => 
+                                    (cloudS.date && localS.date && cloudS.date === localS.date) ||
+                                    (cloudS.clientDate === localS.clientDate && cloudS.clientTime === localS.clientTime && cloudS.pattern === localS.pattern)
+                                );
+                                if (!exists) {
+                                    merged.push(localS);
+                                }
+                            });
+                            merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                            localStorage.setItem("breathingSessions", JSON.stringify(merged.slice(0, 150)));
+
                             if (typeof window !== "undefined") {
                                 if (window.PranaMDI && typeof window.PranaMDI.updateStats === "function") {
                                     window.PranaMDI.updateStats();

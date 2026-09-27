@@ -874,6 +874,59 @@ function startSession() {
     timer = setInterval(tick, 1000);
 }
 
+function recordPranayamaSession(data) {
+    const patternVal = data.pattern || (patternSelect ? patternSelect.value : "4-6");
+    const patternLabel = getPatternDisplayName(patternVal);
+    const durationMins = Number(data.duration) || 1;
+    const cycles = Number(data.cycles) || 1;
+    const wanders = Number(data.mindWanders) || 0;
+    const rating = Number(data.rating) || 5;
+    const now = new Date();
+    const isoDate = data.date || now.toISOString();
+
+    const sessionObj = {
+        date: isoDate,
+        duration: durationMins,
+        pattern: patternLabel,
+        cycles: cycles,
+        mindWanders: wanders,
+        rating: rating,
+        clientDate: now.toLocaleDateString(),
+        clientTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const sessions = getSessions();
+    const idx = sessions.findIndex(s => s.date === isoDate);
+    if (idx >= 0) {
+        sessions[idx] = { ...sessions[idx], ...sessionObj };
+    } else {
+        sessions.unshift(sessionObj);
+    }
+    localStorage.setItem("breathingSessions", JSON.stringify(sessions.slice(0, 150)));
+    loadStats();
+
+    if (window.PranaFirebase && typeof window.PranaFirebase.saveSession === 'function') {
+        window.PranaFirebase.saveSession(sessionObj);
+    }
+
+    return sessionObj;
+}
+window.recordPranayamaSession = recordPranayamaSession;
+
+window.logQuickSession = function(mins = 10, technique = "4-6") {
+    const rec = recordPranayamaSession({
+        pattern: technique,
+        duration: mins,
+        cycles: Math.max(1, Math.round((mins * 60) / 10)),
+        mindWanders: 0,
+        rating: 5
+    });
+    if (typeof window.showNotificationToast === "function") {
+        window.showNotificationToast(`🪷 Logged ${mins}m 4–6 Practice Session!`);
+    }
+    return rec;
+};
+
 function pauseSession() {
     if (!running) return;
     running = false;
@@ -883,40 +936,42 @@ function pauseSession() {
     pauseBtn.disabled = true;
     audio.stopAmbient();
     releaseScreenWakeLock();
+
+    // Auto-save practice if at least 1 cycle or 6+ seconds
+    const elapsed = totalSeconds - remainingTotal;
+    if (elapsed >= 6 || cycleCount >= 1) {
+        const durationMins = Math.max(1, Math.round(elapsed / 60));
+        recordPranayamaSession({
+            pattern: patternSelect.value,
+            duration: durationMins,
+            cycles: cycleCount || 1,
+            mindWanders: mindWanders || 0,
+            rating: 5
+        });
+    }
 }
 
 function resetSession() {
-    releaseScreenWakeLock();
+    const wasRunning = running;
     const elapsed = totalSeconds - remainingTotal;
-    if (elapsed >= 20 && cycleCount > 0) {
-        const durationMins = Math.max(1, Math.round(elapsed / 60));
-        const partial = {
-            date: new Date().toISOString(),
-            duration: durationMins,
-            pattern: patternSelect.value,
-            cycles: cycleCount,
-            mindWanders: mindWanders,
-            rating: 5
-        };
-        const sessions = getSessions();
-        sessions.push(partial);
-        localStorage.setItem("breathingSessions", JSON.stringify(sessions));
-        if (window.PranaFirebase) {
-            window.PranaFirebase.saveSession({
-                pattern: getPatternDisplayName(partial.pattern || "4-6"),
-                duration: durationMins,
-                cycles: partial.cycles,
-                mindWanders: partial.mindWanders,
-                rating: 5,
-                type: "Pranayama"
-            });
-        }
-    }
 
+    releaseScreenWakeLock();
     clearInterval(timer);
     timer = null;
     running = false;
     audio.stopAmbient();
+
+    // If user was actively practicing and resets, auto-save the partial session so no effort is lost
+    if (wasRunning && (elapsed >= 6 || cycleCount >= 1)) {
+        const durationMins = Math.max(1, Math.round(elapsed / 60));
+        recordPranayamaSession({
+            pattern: patternSelect.value,
+            duration: durationMins,
+            cycles: cycleCount || 1,
+            mindWanders: mindWanders || 0,
+            rating: 5
+        });
+    }
 
     totalSeconds = Number(durationSelect.value) * 60;
     remainingTotal = totalSeconds;
@@ -945,10 +1000,16 @@ function resetSession() {
     breathSphere.style.transition = "none";
     breathSphere.style.transform = "scale(1)";
     void breathSphere.offsetWidth;
+    loadStats();
 }
 
 function completeSession() {
-    pauseSession();
+    running = false;
+    clearInterval(timer);
+    timer = null;
+    audio.stopAmbient();
+    releaseScreenWakeLock();
+
     remainingTotal = 0;
     totalTimeText.textContent = "00:00";
     progressBar.style.width = "100%";
@@ -959,35 +1020,17 @@ function completeSession() {
     secondsText.textContent = "✓";
 
     if (bellSelect.value !== 'off') {
-        audio.playSingingBowl(528); // 528Hz Solfeggio frequency for completion
+        audio.playSingingBowl(528);
     }
 
     const durationMins = Number(durationSelect.value) || 1;
-    pendingSession = {
-        date: new Date().toISOString(),
-        duration: durationMins,
+    pendingSession = recordPranayamaSession({
         pattern: patternSelect.value,
-        cycles: cycleCount || 0,
+        duration: durationMins,
+        cycles: cycleCount || 1,
         mindWanders: mindWanders || 0,
         rating: 5
-    };
-
-    // Auto-save to LocalStorage and Firebase immediately
-    const sessions = getSessions();
-    sessions.push(pendingSession);
-    localStorage.setItem("breathingSessions", JSON.stringify(sessions));
-    loadStats();
-
-    if (window.PranaFirebase) {
-        window.PranaFirebase.saveSession({
-            pattern: getPatternDisplayName(pendingSession.pattern || "4-6"),
-            duration: durationMins,
-            cycles: pendingSession.cycles,
-            mindWanders: pendingSession.mindWanders,
-            rating: 5,
-            type: "Pranayama"
-        });
-    }
+    });
 
     ratingModal.classList.add("show");
 }
@@ -1062,23 +1105,18 @@ document.querySelectorAll(".rating-btn").forEach(btn => {
 
 saveRatingBtn.addEventListener("click", () => {
     if (pendingSession) {
-        pendingSession.rating = selectedRating || 5;
+        const rating = selectedRating || 5;
+        pendingSession.rating = rating;
         const sessions = getSessions();
-        if (sessions.length > 0 && sessions[sessions.length - 1].date === pendingSession.date) {
-            sessions[sessions.length - 1].rating = selectedRating || 5;
+        const target = sessions.find(s => s.date === pendingSession.date);
+        if (target) {
+            target.rating = rating;
         } else {
-            sessions.push(pendingSession);
+            sessions.unshift(pendingSession);
         }
-        localStorage.setItem("breathingSessions", JSON.stringify(sessions));
-        if (window.PranaFirebase) {
-            window.PranaFirebase.saveSession({
-                pattern: getPatternDisplayName(pendingSession.pattern || "4-6"),
-                duration: pendingSession.duration || 10,
-                cycles: pendingSession.cycles || 0,
-                mindWanders: pendingSession.mindWanders || 0,
-                rating: selectedRating || 5,
-                type: "Pranayama"
-            });
+        localStorage.setItem("breathingSessions", JSON.stringify(sessions.slice(0, 150)));
+        if (window.PranaFirebase && typeof window.PranaFirebase.saveSession === 'function') {
+            window.PranaFirebase.saveSession(pendingSession);
         }
         pendingSession = null;
         selectedRating = null;
@@ -1098,7 +1136,18 @@ function getSessions() {
 }
 
 function getLocalDateKey(date) {
-    const d = (date instanceof Date) ? date : new Date(date);
+    if (!date) return '';
+    let d = (date instanceof Date) ? date : new Date(date);
+    if (isNaN(d.getTime())) {
+        const parts = String(date).split(/[\/\-\.]/);
+        if (parts.length === 3) {
+            if (parts[2].length === 4) {
+                d = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            } else if (parts[0].length === 4) {
+                d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            }
+        }
+    }
     if (isNaN(d.getTime())) return '';
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -1226,7 +1275,11 @@ function loadStats() {
         historyDiv.innerHTML = `
             <div class="empty-history">
                 <div class="empty-history-icon">🍃</div>
-                <div>No sessions recorded yet. Begin your first Pranayama practice above!</div>
+                <div style="font-weight: 600; margin-bottom: 4px;">No sessions recorded yet.</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Start your 4–6 Pranayama practice above or log your session below!</div>
+                <button class="btn btn-primary" onclick="window.logQuickSession(10, '4-6')" style="font-size: 13px; padding: 8px 18px; margin: 0 auto; display: inline-flex; align-items: center; gap: 6px;">
+                    ➕ Log 10m 4–6 Practice
+                </button>
             </div>
         `;
         return;
