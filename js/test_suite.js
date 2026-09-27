@@ -13,7 +13,7 @@ const ids = [
     'history', 'historyActions', 'refreshHistoryBtn', 'toggleAllGroupsBtn', 'clearHistoryBtn', 'exportCsvBtn',
     'todaySessions', 'totalMinutes', 'totalSessions', 'avgCalm', 'totalWanders', 'streakBadge',
     'badge1', 'badge2', 'badge3', 'badge4', 'badge5',
-    'firebaseModal', 'modalAuthStatus', 'fbInputSmartPaste', 'firebaseSyncBadge', 'firebaseAuthBtn'
+
 ];
 
 const missing = ids.filter(id => !html.includes(`id="${id}"`) && !html.includes(`id='${id}'`));

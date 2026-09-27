@@ -1273,9 +1273,6 @@
         <button id="fullscreenBtn" class="icon-btn">
             ⛶ Fullscreen
         </button>
-        <button id="firebaseAuthBtn" class="icon-btn gold" onclick="openFirebaseModal()" title="Firebase Cloud History Sync (breathwork-c5371)">
-            <span id="firebaseSyncBadge">☁️ Firebase Sync</span>
-        </button>
     </div>
 
     <!-- SETTINGS / CONFIG CARD -->
@@ -1758,96 +1755,8 @@
     </div>
 
 
-<!-- FIREBASE CLOUD SYNC & SETTINGS MODAL -->
-<div id="firebaseModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 540px;">
-        <div class="modal-header">
-            <h2 style="font-family: 'Cinzel', serif; font-size: 18px;">☁️ Firebase Cloud Sync</h2>
-            <button onclick="closeFirebaseModal()" class="icon-btn" style="padding: 4px 10px;">✕</button>
-        </div>
-
-        <div style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5;">
-            Connected Project: <b style="color: var(--accent-cyan);">breathwork-c5371</b><br>
-            All 4–6 practice sessions, streak logs, and calmness scores are backed up to Google Cloud Firestore.
-        </div>
-
-        <!-- DYNAMIC DIAGNOSTIC BOX -->
-        <div id="firebaseDiagnosticBox">
-            <div style="background: var(--card-bg-subtle, rgba(0,0,0,0.05)); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
-                <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">CONNECTION STATUS</div>
-                <div id="modalAuthStatus" style="font-weight: 600; color: var(--accent-cyan); font-size: 13.5px;">Cloud Storage Ready (breathwork-c5371)</div>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-            <button class="icon-btn" onclick="if(window.PranaFirebase) window.PranaFirebase.migrateLocalDataToFirestore();">
-                🔄 Sync Local to Cloud Now
-            </button>
-            <button class="icon-btn" onclick="window.open('https://console.firebase.google.com/project/breathwork-c5371/firestore', '_blank')">
-                🔗 Open Firestore Console
-            </button>
-
-        </div>
-
-        <div style="margin-bottom: 16px;">
-            <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">
-                📋 Paste Firebase API Key (or full firebaseConfig block):
-            </label>
-            <textarea id="fbInputSmartPaste" placeholder='Paste your API Key (e.g. AIzaSy...) or const firebaseConfig = { ... }' style="width: 100%; height: 75px; padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical;"></textarea>
-            <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;">
-                Find this in: Firebase Console ➔ ⚙️ Project Settings ➔ General ➔ Your apps ➔ Web app config.
-            </small>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
-            <button class="btn btn-primary" onclick="saveCustomFirebaseConfig()" style="flex: 1;">
-                💾 Save & Connect Cloud History
-            </button>
-            <button class="icon-btn" onclick="window.PranaFirebase.signInWithGoogle()">
-                🌐 Sign In with Google
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- FIREBASE & PRANAVEDA ENGINE SCRIPTS -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<!-- CLOUD ENGINE & APPLICATION SCRIPTS -->
 <script src="js/firebase-sync.js"></script>
 <script src="js/breathing.js"></script>
-
-<script>
-function openFirebaseModal() {
-    const modal = document.getElementById("firebaseModal");
-    if (modal) {
-        modal.classList.add("show");
-        if (window.PranaFirebase) {
-            window.PranaFirebase.checkDatabaseHealth();
-        }
-    }
-}
-function closeFirebaseModal() {
-    const modal = document.getElementById("firebaseModal");
-    if (modal) modal.classList.remove("show");
-}
-function saveCustomFirebaseConfig() {
-    const raw = document.getElementById("fbInputSmartPaste").value.trim();
-    if (!raw) {
-        alert("Please paste your Firebase API Key or firebaseConfig snippet.");
-        return;
-    }
-    if (window.PranaFirebase) {
-        const parsed = window.PranaFirebase.parseConfigSnippet(raw);
-        if (parsed) {
-            window.PranaFirebase.saveConfig(parsed);
-            alert("Firebase connection updated! Reloading to sync history...");
-            window.location.reload();
-        } else {
-            alert("Could not read API key. Please verify the copied snippet.");
-        }
-    }
-}
-</script>
 </body>
 </html>
