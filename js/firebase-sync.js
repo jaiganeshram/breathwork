@@ -273,6 +273,7 @@
             const clientDate = sessionData.clientDate || new Date().toLocaleDateString();
             const clientTime = sessionData.clientTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
+            const docId = "session_" + nowIso.replace(/[^a-zA-Z0-9]/g, "_");
 
             const entry = {
                 pattern: patternName,
@@ -314,22 +315,23 @@
                 }
             } catch (e) {}
 
-            // 2. Save to Firestore via SDK
+            // 2. Save to Firestore (Shared collection so all mobiles & laptops sync in real-time)
             if (this.db) {
                 try {
-                    this.db.collection("users")
-                        .doc(uid)
-                        .collection("breathingSessions")
-                        .add(entry)
+                    // Save to shared collection accessible by all user devices
+                    this.db.collection("breathingSessions")
+                        .doc(docId)
+                        .set(entry, { merge: true })
                         .then(() => {
-                            console.log("☁️ [Firebase] Session saved to Firestore (breathwork-c5371)!");
+                            console.log("☁️ [Firebase] Global Session saved to Firestore (breathwork-c5371)!");
                             if (typeof window !== "undefined" && window.showNotificationToast) {
-                                window.showNotificationToast("☁️ 4–6 Practice Saved to Firebase History!");
+                                window.showNotificationToast("☁️ 4–6 Practice Synced Across All Devices!");
                             }
                         })
                         .catch((err) => {
-                            console.warn("Firestore write notice:", err.message);
-                            this.db.collection("breathingSessions").add(entry).catch(() => {});
+                            console.warn("Firestore global collection notice:", err.message);
+                            // Also save to user sub-collection
+                            this.db.collection("users").doc(uid).collection("breathingSessions").add(entry).catch(() => {});
                         });
                 } catch (err) {
                     console.warn("Firestore write queued for offline sync:", err.message);
@@ -340,7 +342,7 @@
             try {
                 const proj = this.config.projectId || "breathwork-c5371";
                 if (typeof fetch === "function") {
-                    fetch(`https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents/breathingSessions`, {
+                    fetch(`https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents/breathingSessions?documentId=${docId}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
@@ -383,12 +385,10 @@
             if (this.db) {
                 const uid = entry.uid;
                 try {
-                    this.db.collection("users")
-                        .doc(uid)
-                        .collection("sadhanaLogs")
+                    this.db.collection("sadhanaLogs")
                         .add(entry)
                         .catch(() => {
-                            this.db.collection("sadhanaLogs").add(entry).catch(() => {});
+                            this.db.collection("users").doc(uid).collection("sadhanaLogs").add(entry).catch(() => {});
                         });
                 } catch (err) {
                     console.warn("Firestore sadhana queued:", err.message);
@@ -407,7 +407,7 @@
             if (this.db) {
                 try {
                     this.db.collection("users")
-                        .doc(uid)
+                        .doc("shared_workspace")
                         .set({
                             favorites: favoritesArray,
                             lastUpdated: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
@@ -429,56 +429,67 @@
             });
             this.syncListeners = [];
 
-            // 1. Listen to Breathing Sessions in real-time
+            // 1. Listen to Global Shared Breathing Sessions in real-time (All Devices & Mobiles)
             try {
-                const unsubSessions = this.db.collection("users")
-                    .doc(uid)
-                    .collection("breathingSessions")
-                    .orderBy("timestamp", "desc")
-                    .limit(100)
-                    .onSnapshot((snapshot) => {
-                        const cloudSessions = [];
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            cloudSessions.push({
-                                pattern: data.pattern,
-                                duration: data.duration,
-                                cycles: data.cycles || 0,
-                                mindWanders: data.mindWanders || 0,
-                                rating: data.rating || 5,
-                                date: data.date || (data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
-                                clientDate: data.clientDate || "Today",
-                                clientTime: data.clientTime || ""
-                            });
+                const processSnapshot = (snapshot) => {
+                    const cloudSessions = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        cloudSessions.push({
+                            pattern: data.pattern,
+                            duration: data.duration,
+                            cycles: data.cycles || 0,
+                            mindWanders: data.mindWanders || 0,
+                            rating: data.rating || 5,
+                            date: data.date || (data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
+                            clientDate: data.clientDate || "Today",
+                            clientTime: data.clientTime || ""
                         });
+                    });
 
-                        if (typeof localStorage !== "undefined") {
-                            const localSessions = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
-                            const merged = [...cloudSessions];
-                            localSessions.forEach(localS => {
-                                const exists = merged.some(cloudS => 
-                                    (cloudS.date && localS.date && cloudS.date === localS.date) ||
-                                    (cloudS.clientDate === localS.clientDate && cloudS.clientTime === localS.clientTime && cloudS.pattern === localS.pattern)
-                                );
-                                if (!exists) {
-                                    merged.push(localS);
-                                }
-                            });
-                            merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-                            localStorage.setItem("breathingSessions", JSON.stringify(merged.slice(0, 150)));
+                    if (typeof localStorage !== "undefined") {
+                        const localSessions = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
+                        const merged = [...cloudSessions];
+                        localSessions.forEach(localS => {
+                            const exists = merged.some(cloudS => 
+                                (cloudS.date && localS.date && cloudS.date === localS.date) ||
+                                (cloudS.clientDate === localS.clientDate && cloudS.clientTime === localS.clientTime && cloudS.pattern === localS.pattern)
+                            );
+                            if (!exists) {
+                                merged.push(localS);
+                            }
+                        });
+                        merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                        localStorage.setItem("breathingSessions", JSON.stringify(merged.slice(0, 150)));
 
-                            if (typeof window !== "undefined") {
-                                if (window.PranaMDI && typeof window.PranaMDI.updateStats === "function") {
-                                    window.PranaMDI.updateStats();
-                                }
-                                if (typeof window.loadStats === "function") {
-                                    window.loadStats();
-                                }
+                        if (typeof window !== "undefined") {
+                            if (window.PranaMDI && typeof window.PranaMDI.updateStats === "function") {
+                                window.PranaMDI.updateStats();
+                            }
+                            if (typeof window.loadStats === "function") {
+                                window.loadStats();
                             }
                         }
-                    }, (err) => console.warn("Sessions snapshot notice:", err.message));
+                    }
+                };
 
-                this.syncListeners.push(unsubSessions);
+                // Primary Listener: Shared Breathing Sessions across all devices
+                const unsubGlobalSessions = this.db.collection("breathingSessions")
+                    .orderBy("date", "desc")
+                    .limit(100)
+                    .onSnapshot(processSnapshot, (err) => {
+                        console.warn("Global sessions snapshot notice (trying user subcollection):", err.message);
+                        // Fallback listener: user sub-collection
+                        const unsubUserSessions = this.db.collection("users")
+                            .doc(uid)
+                            .collection("breathingSessions")
+                            .orderBy("timestamp", "desc")
+                            .limit(100)
+                            .onSnapshot(processSnapshot, () => {});
+                        this.syncListeners.push(unsubUserSessions);
+                    });
+
+                this.syncListeners.push(unsubGlobalSessions);
             } catch (e) {
                 console.warn("Snapshot attach notice:", e);
             }
@@ -486,7 +497,7 @@
             // 2. Listen to Asana Favorites in real-time
             try {
                 const unsubFavs = this.db.collection("users")
-                    .doc(uid)
+                    .doc("shared_workspace")
                     .onSnapshot((doc) => {
                         if (doc.exists && doc.data().favorites && typeof localStorage !== "undefined") {
                             const favs = doc.data().favorites;
@@ -512,7 +523,8 @@
                 const batch = this.db.batch();
 
                 localSessions.slice(0, 50).forEach((s) => {
-                    const ref = this.db.collection("users").doc(uid).collection("breathingSessions").doc();
+                    const docId = "session_" + (s.date || new Date().toISOString()).replace(/[^a-zA-Z0-9]/g, "_");
+                    const ref = this.db.collection("breathingSessions").doc(docId);
                     batch.set(ref, {
                         pattern: s.pattern,
                         duration: s.duration,
@@ -522,25 +534,27 @@
                         clientDate: s.clientDate || s.date || "Today",
                         clientTime: s.clientTime || "",
                         date: s.date || new Date().toISOString(),
+                        uid: uid,
                         timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
                             ? firebase.firestore.FieldValue.serverTimestamp()
                             : new Date().toISOString()
-                    });
+                    }, { merge: true });
                     count++;
                 });
 
                 if (localFavs.length > 0) {
-                    const userDoc = this.db.collection("users").doc(uid);
+                    const userDoc = this.db.collection("users").doc("shared_workspace");
                     batch.set(userDoc, { favorites: localFavs }, { merge: true });
                 }
 
                 await batch.commit();
-                console.log(`☁️ Successfully migrated ${count} records to Cloud Firestore (breathwork-c5371)!`);
+                console.log(`☁️ Successfully synced ${count} records across all devices on Cloud Firestore (breathwork-c5371)!`);
                 if (typeof window !== "undefined" && window.showNotificationToast) {
-                    window.showNotificationToast(`☁️ ${count} Sadhana records migrated to Firebase Cloud!`);
+                    window.showNotificationToast(`☁️ ${count} sessions synced across all devices!`);
                 }
             } catch (err) {
                 console.error("Migration error:", err);
+                alert("Cloud Sync Notice: " + err.message + "\n\nPlease ensure Firestore Database is created in your Firebase Console.");
             }
         }
 

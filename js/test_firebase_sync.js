@@ -31,7 +31,13 @@ const mockFirebase = {
                 }),
                 set: (data, opts) => Promise.resolve(),
                 onSnapshot: (cb) => cb({ exists: true, data: () => ({ favorites: [] }) })
-            })
+            }),
+            orderBy: () => ({
+                limit: () => ({
+                    onSnapshot: (cb) => cb([])
+                })
+            }),
+            add: () => Promise.resolve({ id: 'doc-123' })
         }),
         batch: () => ({
             set: () => {},
