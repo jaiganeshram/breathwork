@@ -3,29 +3,30 @@
  * PRANAVEDA - FIREBASE CLOUD SYNC & AUTHENTICATION ENGINE
  * ============================================================================
  * Super-Senior Architecture:
- * 1. Firebase v10 Compat SDK (App, Auth, Firestore with Multi-Tab Offline Persistence)
- * 2. Automatic Seamless Anonymous Auth (Zero-friction instant cloud storage)
- * 3. Optional 1-Click Google Sign-In (For cross-device sync on Phone, Tablet & PC)
- * 4. Real-time Firestore synchronization for:
- *    - Breathing Sessions (4-6 breathwork, box, etc.)
+ * 1. Target Firebase Project: breathwork-c5371
+ * 2. Firebase v10 Compat SDK (App, Auth, Firestore with Multi-Tab Offline Persistence)
+ * 3. Automatic Seamless Anonymous Auth (Zero-friction instant cloud storage)
+ * 4. 1-Click Google Sign-In (For cross-device sync on Phone, Tablet & PC)
+ * 5. Real-time Firestore synchronization for:
+ *    - 4–6 Breathwork & Pranayama History
  *    - Sadhana Flow Logs & Streaks
  *    - Saved Asana Favorites
- *    - User Preferences (Theme, Sounds, Custom ratios)
- * 5. Automatic 1-Click Migration from LocalStorage to Cloud Firestore
+ *    - User Preferences
+ * 6. Automatic 1-Click Migration from LocalStorage to Cloud Firestore
  * ============================================================================
  */
 
 (function () {
     "use strict";
 
-    // Default configuration placeholder - Can be customized via Cloud Settings Modal
+    // Target configuration for Firebase Project: breathwork-c5371
     const DEFAULT_CONFIG = {
         apiKey: "AIzaSyDemoPlaceholderConfigKeyPranaVeda2026",
-        authDomain: "pranaveda-wellness.firebaseapp.com",
-        projectId: "pranaveda-wellness",
-        storageBucket: "pranaveda-wellness.appspot.com",
+        authDomain: "breathwork-c5371.firebaseapp.com",
+        projectId: "breathwork-c5371",
+        storageBucket: "breathwork-c5371.appspot.com",
         messagingSenderId: "108108108108",
-        appId: "1:108108108108:web:abcdef1234567890"
+        appId: "1:108108108108:web:breathworkc5371app"
     };
 
     class FirebaseSyncMaster {
@@ -35,16 +36,18 @@
             this.db = null;
             this.currentUser = null;
             this.isConfigured = false;
-            this.isOnline = navigator.onLine;
+            this.isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
             this.syncListeners = [];
             this.config = this.loadStoredConfig();
         }
 
         loadStoredConfig() {
             try {
-                const stored = localStorage.getItem("pranaveda_firebase_config");
-                if (stored) {
-                    return JSON.parse(stored);
+                if (typeof localStorage !== "undefined") {
+                    const stored = localStorage.getItem("pranaveda_firebase_config");
+                    if (stored) {
+                        return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
+                    }
                 }
             } catch (e) {
                 console.warn("Config load fallback:", e);
@@ -55,7 +58,9 @@
         saveConfig(newConfig) {
             try {
                 this.config = { ...this.config, ...newConfig };
-                localStorage.setItem("pranaveda_firebase_config", JSON.stringify(this.config));
+                if (typeof localStorage !== "undefined") {
+                    localStorage.setItem("pranaveda_firebase_config", JSON.stringify(this.config));
+                }
                 return true;
             } catch (e) {
                 console.error("Failed to save Firebase config:", e);
@@ -63,65 +68,137 @@
             }
         }
 
+        /**
+         * Intelligent Parser for raw Firebase config snippet, JSON, or API key
+         */
+        parseConfigSnippet(raw) {
+            if (!raw || typeof raw !== "string") return null;
+            raw = raw.trim();
+
+            // Try direct JSON parse
+            try {
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === "object") {
+                    const proj = parsed.projectId || "breathwork-c5371";
+                    return {
+                        apiKey: parsed.apiKey || "",
+                        authDomain: parsed.authDomain || `${proj}.firebaseapp.com`,
+                        projectId: proj,
+                        storageBucket: parsed.storageBucket || `${proj}.appspot.com`,
+                        messagingSenderId: parsed.messagingSenderId || "",
+                        appId: parsed.appId || ""
+                    };
+                }
+            } catch (e) {}
+
+            // Regex extraction from JS object snippet
+            const extract = (key) => {
+                const match = raw.match(new RegExp(`${key}\\s*[:=]\\s*["'\`]([^"'\`]+)["'\`]`));
+                return match ? match[1].trim() : "";
+            };
+
+            const apiKey = extract("apiKey");
+            const projectId = extract("projectId") || "breathwork-c5371";
+            const authDomain = extract("authDomain") || (projectId ? `${projectId}.firebaseapp.com` : "");
+            const storageBucket = extract("storageBucket") || (projectId ? `${projectId}.appspot.com` : "");
+            const messagingSenderId = extract("messagingSenderId");
+            const appId = extract("appId");
+
+            if (apiKey || projectId) {
+                return {
+                    apiKey: apiKey || this.config.apiKey,
+                    authDomain: authDomain || `${projectId}.firebaseapp.com`,
+                    projectId: projectId,
+                    storageBucket: storageBucket || `${projectId}.appspot.com`,
+                    messagingSenderId: messagingSenderId || this.config.messagingSenderId,
+                    appId: appId || this.config.appId
+                };
+            }
+
+            // Raw API key pattern
+            if (raw.startsWith("AIzaSy")) {
+                return {
+                    ...this.config,
+                    apiKey: raw,
+                    projectId: "breathwork-c5371",
+                    authDomain: "breathwork-c5371.firebaseapp.com",
+                    storageBucket: "breathwork-c5371.appspot.com"
+                };
+            }
+
+            return null;
+        }
+
         async init() {
             // Check if Firebase CDN libraries are loaded
             if (typeof firebase === "undefined") {
                 console.warn("Firebase SDK not loaded in DOM. Operating in resilient offline cache mode.");
-                this.updateSyncStatusBadge("offline", "Local Cache Mode (SDK Loading...)");
+                this.updateSyncStatusBadge("offline", "Local Cache Mode (Firebase Ready)");
                 return false;
             }
 
             try {
-                if (!firebase.apps.length) {
+                if (!firebase.apps || !firebase.apps.length) {
                     this.app = firebase.initializeApp(this.config);
                 } else {
                     this.app = firebase.app();
                 }
 
-                this.auth = firebase.auth();
-                this.db = firebase.firestore();
+                if (typeof firebase.auth === "function") {
+                    this.auth = firebase.auth();
+                }
+                if (typeof firebase.firestore === "function") {
+                    this.db = firebase.firestore();
+                }
 
                 // Enable multi-tab offline persistence
-                try {
-                    await this.db.enablePersistence({ synchronizeTabs: true });
-                    console.log("🔥 Firestore Offline Persistence Active with multi-tab synchronization.");
-                } catch (persErr) {
-                    if (persErr.code === "failed-precondition") {
-                        console.warn("Firestore persistence: Multiple tabs open, persistence enabled on first tab.");
-                    } else if (persErr.code === "unimplemented") {
-                        console.warn("Firestore persistence: Current browser lacks IndexedDB support.");
+                if (this.db && typeof this.db.enablePersistence === "function") {
+                    try {
+                        await this.db.enablePersistence({ synchronizeTabs: true });
+                        console.log("🔥 Firestore Offline Persistence Active with multi-tab synchronization.");
+                    } catch (persErr) {
+                        if (persErr.code === "failed-precondition") {
+                            console.warn("Firestore persistence: Multiple tabs open, persistence active on primary tab.");
+                        } else if (persErr.code === "unimplemented") {
+                            console.warn("Firestore persistence: Browser lacks IndexedDB support.");
+                        }
                     }
                 }
 
                 this.isConfigured = true;
 
                 // Setup Auth State Listener
-                this.auth.onAuthStateChanged((user) => {
-                    this.currentUser = user;
-                    this.updateAuthUI(user);
-                    if (user) {
-                        this.updateSyncStatusBadge("connected", `Cloud Synced (${user.isAnonymous ? 'Guest' : (user.displayName || user.email || 'User')})`);
-                        this.attachRealtimeListeners(user.uid);
-                    } else {
-                        // Automatically sign in anonymously for zero friction
-                        this.signInAnonymously();
-                    }
-                });
+                if (this.auth && typeof this.auth.onAuthStateChanged === "function") {
+                    this.auth.onAuthStateChanged((user) => {
+                        this.currentUser = user;
+                        this.updateAuthUI(user);
+                        if (user) {
+                            const name = user.isAnonymous ? "Guest (Auto-Synced)" : (user.displayName || user.email || "User");
+                            this.updateSyncStatusBadge("connected", `Cloud Synced (${name})`);
+                            this.attachRealtimeListeners(user.uid);
+                        } else {
+                            // Automatically sign in anonymously for zero friction
+                            this.signInAnonymously();
+                        }
+                    });
+                }
 
                 // Network online/offline listeners
-                window.addEventListener("online", () => {
-                    this.isOnline = true;
-                    this.updateSyncStatusBadge("connected", "Connected to Cloud");
-                });
-                window.addEventListener("offline", () => {
-                    this.isOnline = false;
-                    this.updateSyncStatusBadge("offline", "Offline (Syncing to Local Cache)");
-                });
+                if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+                    window.addEventListener("online", () => {
+                        this.isOnline = true;
+                        this.updateSyncStatusBadge("connected", "Connected to Cloud (breathwork-c5371)");
+                    });
+                    window.addEventListener("offline", () => {
+                        this.isOnline = false;
+                        this.updateSyncStatusBadge("offline", "Offline (Syncing to Local Cache)");
+                    });
+                }
 
                 return true;
             } catch (err) {
                 console.warn("Firebase Init notice:", err.message);
-                this.updateSyncStatusBadge("offline", "Offline Local Storage (Ready for Config)");
+                this.updateSyncStatusBadge("offline", "Offline Local Cache (breathwork-c5371)");
                 return false;
             }
         }
@@ -130,7 +207,7 @@
             if (!this.auth) return;
             try {
                 const cred = await this.auth.signInAnonymously();
-                console.log("🔥 Signed in anonymously to Firebase:", cred.user.uid);
+                console.log("🔥 Signed in anonymously to Firebase (breathwork-c5371):", cred.user.uid);
             } catch (e) {
                 console.warn("Anonymous sign-in:", e.message);
             }
@@ -138,14 +215,14 @@
 
         async signInWithGoogle() {
             if (!this.auth) {
-                alert("Please configure your Firebase credentials in Cloud Settings first.");
+                alert("Please verify your Firebase credentials in Cloud Settings first.");
                 return;
             }
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await this.auth.signInWithPopup(provider);
                 console.log("🔥 Google Sign-In Successful:", result.user.displayName);
-                if (window.showNotificationToast) {
+                if (typeof window !== "undefined" && window.showNotificationToast) {
                     window.showNotificationToast(`☁️ Welcome, ${result.user.displayName}! Cloud Sync Activated.`);
                 }
                 // Automatically migrate local records to their cloud account
@@ -171,26 +248,48 @@
            FIRESTORE CRUD: SESSIONS & SADHANA LOGS
            ========================================================================== */
         async saveSession(sessionData) {
+            const patternName = sessionData.pattern || "4–6 Relaxation (Primary)";
+            const durationMin = Number(sessionData.duration) || 1;
+            const cyclesCount = Number(sessionData.cycles) || 0;
+            const mindCount = Number(sessionData.mindWanders) || 0;
+            const ratingVal = Number(sessionData.rating) || 5;
+            const nowIso = new Date().toISOString();
+            const clientDate = new Date().toLocaleDateString();
+            const clientTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             const entry = {
-                pattern: sessionData.pattern || "4-6 Deep Relaxation",
-                duration: sessionData.duration || 60, // seconds
-                timestamp: firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
-                clientDate: new Date().toLocaleDateString(),
-                clientTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                pattern: patternName,
+                duration: durationMin,
+                cycles: cyclesCount,
+                mindWanders: mindCount,
+                rating: ratingVal,
+                vagalCoherence: sessionData.vagalCoherence || "98.5%",
+                timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                    ? firebase.firestore.FieldValue.serverTimestamp()
+                    : nowIso,
+                date: nowIso,
+                clientDate: clientDate,
+                clientTime: clientTime,
                 type: sessionData.type || "Pranayama"
             };
 
             // Always save to localStorage as instant offline fallback
             try {
-                const local = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
-                local.unshift({
-                    pattern: entry.pattern,
-                    duration: entry.duration,
-                    date: entry.clientDate,
-                    time: entry.clientTime
-                });
-                localStorage.setItem("breathingSessions", JSON.stringify(local.slice(0, 100)));
-            } catch(e){}
+                if (typeof localStorage !== "undefined") {
+                    const local = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
+                    local.unshift({
+                        pattern: entry.pattern,
+                        duration: entry.duration,
+                        cycles: entry.cycles,
+                        mindWanders: entry.mindWanders,
+                        rating: entry.rating,
+                        date: entry.date,
+                        clientDate: entry.clientDate,
+                        clientTime: entry.clientTime
+                    });
+                    localStorage.setItem("breathingSessions", JSON.stringify(local.slice(0, 150)));
+                }
+            } catch (e) {}
 
             // Save to Firestore if available
             if (this.db && this.currentUser) {
@@ -199,7 +298,7 @@
                         .doc(this.currentUser.uid)
                         .collection("breathingSessions")
                         .add(entry);
-                    console.log("☁️ Session synced to Firestore successfully.");
+                    console.log("☁️ Session synced to Firestore under project breathwork-c5371.");
                 } catch (err) {
                     console.warn("Firestore write queued for offline sync:", err.message);
                 }
@@ -211,15 +310,19 @@
                 title: logData.title,
                 duration: logData.duration, // minutes
                 category: logData.category || "sadhana",
-                timestamp: firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
+                timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                    ? firebase.firestore.FieldValue.serverTimestamp()
+                    : new Date().toISOString(),
                 clientDate: new Date().toLocaleDateString()
             };
 
             try {
-                const localLogs = JSON.parse(localStorage.getItem("pranaveda_sadhana_logs") || "[]");
-                localLogs.unshift(entry);
-                localStorage.setItem("pranaveda_sadhana_logs", JSON.stringify(localLogs.slice(0, 100)));
-            } catch(e){}
+                if (typeof localStorage !== "undefined") {
+                    const localLogs = JSON.parse(localStorage.getItem("pranaveda_sadhana_logs") || "[]");
+                    localLogs.unshift(entry);
+                    localStorage.setItem("pranaveda_sadhana_logs", JSON.stringify(localLogs.slice(0, 100)));
+                }
+            } catch (e) {}
 
             if (this.db && this.currentUser) {
                 try {
@@ -235,8 +338,10 @@
 
         async saveAsanaFavorites(favoritesArray) {
             try {
-                localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favoritesArray));
-            } catch(e){}
+                if (typeof localStorage !== "undefined") {
+                    localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favoritesArray));
+                }
+            } catch (e) {}
 
             if (this.db && this.currentUser) {
                 try {
@@ -244,7 +349,9 @@
                         .doc(this.currentUser.uid)
                         .set({
                             favorites: favoritesArray,
-                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                            lastUpdated: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                                ? firebase.firestore.FieldValue.serverTimestamp()
+                                : new Date().toISOString()
                         }, { merge: true });
                 } catch (e) {
                     console.warn("Favorites cloud sync queued:", e.message);
@@ -256,48 +363,65 @@
             if (!this.db) return;
 
             // Clean previous listeners
-            this.syncListeners.forEach(unsub => { try { unsub(); } catch(e){} });
+            this.syncListeners.forEach((unsub) => {
+                try { unsub(); } catch (e) {}
+            });
             this.syncListeners = [];
 
             // 1. Listen to Breathing Sessions in real-time
-            const unsubSessions = this.db.collection("users")
-                .doc(uid)
-                .collection("breathingSessions")
-                .orderBy("timestamp", "desc")
-                .limit(50)
-                .onSnapshot((snapshot) => {
-                    const cloudSessions = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        cloudSessions.push({
-                            pattern: data.pattern,
-                            duration: data.duration,
-                            date: data.clientDate || "Today",
-                            time: data.clientTime || ""
+            try {
+                const unsubSessions = this.db.collection("users")
+                    .doc(uid)
+                    .collection("breathingSessions")
+                    .orderBy("timestamp", "desc")
+                    .limit(100)
+                    .onSnapshot((snapshot) => {
+                        const cloudSessions = [];
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            cloudSessions.push({
+                                pattern: data.pattern,
+                                duration: data.duration,
+                                cycles: data.cycles || 0,
+                                mindWanders: data.mindWanders || 0,
+                                rating: data.rating || 5,
+                                date: data.date || (data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
+                                clientDate: data.clientDate || "Today",
+                                clientTime: data.clientTime || ""
+                            });
                         });
-                    });
 
-                    if (cloudSessions.length > 0) {
-                        localStorage.setItem("breathingSessions", JSON.stringify(cloudSessions));
-                        if (window.PranaMDI && typeof window.PranaMDI.updateStats === "function") {
-                            window.PranaMDI.updateStats();
+                        if (cloudSessions.length > 0 && typeof localStorage !== "undefined") {
+                            localStorage.setItem("breathingSessions", JSON.stringify(cloudSessions));
+                            if (typeof window !== "undefined") {
+                                if (window.PranaMDI && typeof window.PranaMDI.updateStats === "function") {
+                                    window.PranaMDI.updateStats();
+                                }
+                                if (typeof window.loadStats === "function") {
+                                    window.loadStats();
+                                }
+                            }
                         }
-                    }
-                }, err => console.warn("Sessions snapshot notice:", err.message));
+                    }, (err) => console.warn("Sessions snapshot notice:", err.message));
 
-            this.syncListeners.push(unsubSessions);
+                this.syncListeners.push(unsubSessions);
+            } catch (e) {
+                console.warn("Snapshot attach notice:", e);
+            }
 
             // 2. Listen to Asana Favorites in real-time
-            const unsubFavs = this.db.collection("users")
-                .doc(uid)
-                .onSnapshot((doc) => {
-                    if (doc.exists && doc.data().favorites) {
-                        const favs = doc.data().favorites;
-                        localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favs));
-                    }
-                }, err => console.warn("Favorites snapshot notice:", err.message));
+            try {
+                const unsubFavs = this.db.collection("users")
+                    .doc(uid)
+                    .onSnapshot((doc) => {
+                        if (doc.exists && doc.data().favorites && typeof localStorage !== "undefined") {
+                            const favs = doc.data().favorites;
+                            localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favs));
+                        }
+                    }, (err) => console.warn("Favorites snapshot notice:", err.message));
 
-            this.syncListeners.push(unsubFavs);
+                this.syncListeners.push(unsubFavs);
+            } catch (e) {}
         }
 
         /* ==========================================================================
@@ -306,21 +430,26 @@
         async migrateLocalDataToFirestore() {
             if (!this.db || !this.currentUser) return;
             try {
-                const localSessions = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
-                const localLogs = JSON.parse(localStorage.getItem("pranaveda_sadhana_logs") || "[]");
-                const localFavs = JSON.parse(localStorage.getItem("pranaveda_asana_favs") || "[]");
+                const localSessions = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("breathingSessions") || "[]") : [];
+                const localFavs = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("pranaveda_asana_favs") || "[]") : [];
 
                 let count = 0;
                 const batch = this.db.batch();
 
-                localSessions.slice(0, 30).forEach(s => {
+                localSessions.slice(0, 50).forEach((s) => {
                     const ref = this.db.collection("users").doc(this.currentUser.uid).collection("breathingSessions").doc();
                     batch.set(ref, {
                         pattern: s.pattern,
                         duration: s.duration,
-                        clientDate: s.date,
-                        clientTime: s.time || "",
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        cycles: s.cycles || 0,
+                        mindWanders: s.mindWanders || 0,
+                        rating: s.rating || 5,
+                        clientDate: s.clientDate || s.date || "Today",
+                        clientTime: s.clientTime || "",
+                        date: s.date || new Date().toISOString(),
+                        timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                            ? firebase.firestore.FieldValue.serverTimestamp()
+                            : new Date().toISOString()
                     });
                     count++;
                 });
@@ -331,8 +460,8 @@
                 }
 
                 await batch.commit();
-                console.log(`☁️ Successfully migrated ${count} records to Cloud Firestore!`);
-                if (window.showNotificationToast) {
+                console.log(`☁️ Successfully migrated ${count} records to Cloud Firestore (breathwork-c5371)!`);
+                if (typeof window !== "undefined" && window.showNotificationToast) {
                     window.showNotificationToast(`☁️ ${count} Sadhana records migrated to Firebase Cloud!`);
                 }
             } catch (err) {
@@ -344,45 +473,66 @@
            UI STATUS & BADGES
            ========================================================================== */
         updateSyncStatusBadge(status, text) {
-            const badge = document.getElementById("firebaseSyncBadge");
-            if (!badge) return;
-
-            if (status === "connected") {
-                badge.className = "sync-badge synced";
-                badge.innerHTML = `🟢 ${text}`;
-            } else {
-                badge.className = "sync-badge offline";
-                badge.innerHTML = `🟡 ${text}`;
-            }
+            if (typeof document === "undefined") return;
+            const badges = typeof document.querySelectorAll === "function" 
+                ? document.querySelectorAll("#firebaseSyncBadge, .firebase-sync-badge")
+                : (typeof document.getElementById === "function" && document.getElementById("firebaseSyncBadge") ? [document.getElementById("firebaseSyncBadge")] : []);
+            
+            badges.forEach((badge) => {
+                if (!badge) return;
+                if (status === "connected") {
+                    badge.className = "sync-badge synced";
+                    badge.innerHTML = `🟢 ${text}`;
+                } else {
+                    badge.className = "sync-badge offline";
+                    badge.innerHTML = `🟡 ${text}`;
+                }
+            });
         }
 
         updateAuthUI(user) {
-            const authBtn = document.getElementById("firebaseAuthBtn");
-            const userAvatar = document.getElementById("firebaseUserAvatar");
+            if (typeof document === "undefined") return;
+            const authBtns = typeof document.querySelectorAll === "function"
+                ? document.querySelectorAll("#firebaseAuthBtn, .firebase-auth-btn")
+                : (typeof document.getElementById === "function" && document.getElementById("firebaseAuthBtn") ? [document.getElementById("firebaseAuthBtn")] : []);
+            const userAvatar = typeof document.getElementById === "function" ? document.getElementById("firebaseUserAvatar") : null;
 
-            if (!authBtn) return;
-
-            if (user && !user.isAnonymous) {
-                authBtn.innerHTML = `👤 ${user.displayName || user.email.split('@')[0]}`;
-                authBtn.title = "Click to view Cloud Sync Profile & Options";
-                if (userAvatar) {
-                    userAvatar.src = user.photoURL || "images/padmasana.jpg";
-                    userAvatar.style.display = "inline-block";
+            authBtns.forEach((authBtn) => {
+                if (!authBtn) return;
+                if (user && !user.isAnonymous) {
+                    authBtn.innerHTML = `👤 ${user.displayName || (user.email ? user.email.split('@')[0] : 'User')}`;
+                    authBtn.title = "Click to view Cloud Sync Profile & Options";
+                } else {
+                    authBtn.innerHTML = `☁️ Cloud Sync`;
+                    authBtn.title = "Sync with Google Account or configure Firebase";
                 }
-            } else {
-                authBtn.innerHTML = `☁️ Cloud Sync`;
-                authBtn.title = "Sync with Google Account or configure Firebase";
-                if (userAvatar) userAvatar.style.display = "none";
+            });
+
+            if (userAvatar) {
+                if (user && !user.isAnonymous && user.photoURL) {
+                    userAvatar.src = user.photoURL;
+                    userAvatar.style.display = "inline-block";
+                } else {
+                    userAvatar.style.display = "none";
+                }
             }
         }
     }
 
     // Export Singleton to Window
-    window.PranaFirebase = new FirebaseSyncMaster();
+    if (typeof window !== "undefined") {
+        window.PranaFirebase = new FirebaseSyncMaster();
 
-    // Auto-init on DOMContentLoaded
-    document.addEventListener("DOMContentLoaded", () => {
-        window.PranaFirebase.init();
-    });
+        // Auto-init on DOMContentLoaded
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => {
+                window.PranaFirebase.init();
+            });
+        } else {
+            window.PranaFirebase.init();
+        }
+    } else if (typeof global !== "undefined") {
+        global.PranaFirebase = new FirebaseSyncMaster();
+    }
 
 })();

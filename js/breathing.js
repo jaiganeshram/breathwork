@@ -983,8 +983,11 @@ saveRatingBtn.addEventListener("click", () => {
         localStorage.setItem("breathingSessions", JSON.stringify(sessions));
         if (window.PranaFirebase) {
             window.PranaFirebase.saveSession({
-                pattern: pendingSession.pattern || "4-6 Deep Relaxation",
-                duration: pendingSession.duration || 60,
+                pattern: getPatternDisplayName(pendingSession.pattern || "4-6"),
+                duration: pendingSession.duration || 10,
+                cycles: pendingSession.cycles || 0,
+                mindWanders: pendingSession.mindWanders || 0,
+                rating: pendingSession.rating || 5,
                 type: "Pranayama"
             });
         }
@@ -1433,6 +1436,10 @@ function init() {
     totalTimeText.textContent = formatTime(totalSeconds);
     secondsText.textContent = Math.ceil(totalSeconds / 60);
     loadStats();
+}
+
+if (typeof window !== 'undefined') {
+    window.loadStats = loadStats;
 }
 
 init();
