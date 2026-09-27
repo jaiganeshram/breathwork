@@ -227,6 +227,7 @@ const chakraGuide = document.getElementById("chakraGuide");
 
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
+const endBtn = document.getElementById("endBtn");
 const resetBtn = document.getElementById("resetBtn");
 const mindBtn = document.getElementById("mindBtn");
 
@@ -867,6 +868,7 @@ function startSession() {
     running = true;
     startBtn.disabled = true;
     pauseBtn.disabled = false;
+    if (endBtn) endBtn.disabled = false;
 
     if (phaseRemaining <= 0) {
         updatePhase();
@@ -921,6 +923,7 @@ function pauseSession() {
     timer = null;
     startBtn.disabled = false;
     pauseBtn.disabled = true;
+    if (endBtn) endBtn.disabled = false;
     audio.stopAmbient();
     releaseScreenWakeLock();
 
@@ -970,6 +973,7 @@ function resetSession() {
 
     startBtn.disabled = false;
     pauseBtn.disabled = true;
+    if (endBtn) endBtn.disabled = true;
 
     nostrilGuide.classList.remove("active");
     mettaGuide.classList.remove("active");
@@ -990,12 +994,21 @@ function resetSession() {
     loadStats();
 }
 
-function completeSession() {
+function completeSession(isEarly = false) {
+    const elapsed = totalSeconds - remainingTotal;
+    const actualMinutes = isEarly 
+        ? Math.max(1, Math.round(elapsed / 60)) 
+        : (Number(durationSelect.value) || 1);
+
     running = false;
     clearInterval(timer);
     timer = null;
     audio.stopAmbient();
     releaseScreenWakeLock();
+
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    if (endBtn) endBtn.disabled = true;
 
     remainingTotal = 0;
     totalTimeText.textContent = "00:00";
@@ -1010,14 +1023,20 @@ function completeSession() {
         audio.playSingingBowl(528);
     }
 
-    const durationMins = Number(durationSelect.value) || 1;
     pendingSession = recordPranayamaSession({
         pattern: patternSelect.value,
-        duration: durationMins,
+        duration: actualMinutes,
         cycles: cycleCount || 1,
         mindWanders: mindWanders || 0,
         rating: 5
     });
+
+    const modalTitle = document.getElementById("ratingModalTitle");
+    if (modalTitle) {
+        modalTitle.textContent = isEarly 
+            ? `Completed ${actualMinutes}m Sadhana` 
+            : `Sadhana Complete (${actualMinutes}m)`;
+    }
 
     ratingModal.classList.add("show");
 }
@@ -1045,6 +1064,18 @@ breathSphere.addEventListener("click", () => {
 
 startBtn.addEventListener("click", startSession);
 pauseBtn.addEventListener("click", pauseSession);
+if (endBtn) {
+    endBtn.addEventListener("click", () => {
+        const elapsed = totalSeconds - remainingTotal;
+        if (elapsed < 6 && cycleCount < 1) {
+            if (confirm("You just started! Do you want to reset instead?")) {
+                resetSession();
+            }
+            return;
+        }
+        completeSession(true);
+    });
+}
 resetBtn.addEventListener("click", resetSession);
 
 mindBtn.addEventListener("click", () => {

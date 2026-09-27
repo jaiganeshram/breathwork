@@ -656,6 +656,18 @@
             transform: translateY(-2px);
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #2ea879 0%, #20875e 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(46, 168, 121, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 168, 121, 0.45);
+            filter: brightness(1.08);
+        }
+
         .btn-danger {
             background: rgba(224, 93, 93, 0.12);
             color: var(--danger);
@@ -1450,6 +1462,9 @@
                 <button id="pauseBtn" class="btn btn-secondary" disabled>
                     ⏸ Pause
                 </button>
+                <button id="endBtn" class="btn btn-success" disabled title="Finish practice early and save exact elapsed time">
+                    ✓ End & Save
+                </button>
                 <button id="resetBtn" class="btn btn-danger">
                     ↻ Reset
                 </button>
@@ -1541,7 +1556,7 @@
 <div id="ratingModal" class="modal-overlay">
     <div class="modal-box" style="text-align: center;">
         <div style="font-size: 40px; margin-bottom: 8px;">🪷</div>
-        <h2 style="font-family: 'Cinzel', serif; margin-bottom: 6px;">Sadhana Complete</h2>
+        <h2 id="ratingModalTitle" style="font-family: 'Cinzel', serif; margin-bottom: 6px;">Sadhana Complete</h2>
         <p style="color: var(--text-secondary); font-size: 14px;">How serene and centered do you feel right now?</p>
 
         <div class="rating-btn-group">
