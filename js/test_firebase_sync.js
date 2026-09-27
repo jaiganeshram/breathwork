@@ -81,7 +81,9 @@ const context = vm.createContext({
     Date,
     JSON,
     Array,
-    Set
+    Set,
+    setInterval: () => 1,
+    clearInterval: () => {}
 });
 
 try {

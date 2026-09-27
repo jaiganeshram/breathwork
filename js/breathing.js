@@ -1587,9 +1587,198 @@ fullscreenBtn.addEventListener("click", async () => {
     }
 });
 
+/* ==========================================================================
+   MULTI-DEVICE SYNC & QR TRANSFER ENGINE (LAPTOP <-> MOBILE <-> TABLET)
+   ========================================================================== */
+function checkUrlSyncPayload() {
+    try {
+        if (typeof window === "undefined" || !window.location || !window.location.search) return;
+        const params = new URLSearchParams(window.location.search);
+        const syncData = params.get("sync_data") || params.get("sync");
+        if (!syncData) return;
+
+        let sessionsToMerge = [];
+        try {
+            const rawJson = decodeURIComponent(escape(atob(syncData)));
+            const parsed = JSON.parse(rawJson);
+            if (Array.isArray(parsed)) {
+                if (parsed.length > 0 && Array.isArray(parsed[0])) {
+                    // Compact format [pattern, duration, cycles, wanders, rating, date, clientDate, clientTime]
+                    sessionsToMerge = parsed.map(arr => ({
+                        pattern: arr[0] || "4–6 Relaxation",
+                        duration: Number(arr[1]) || 1,
+                        cycles: Number(arr[2]) || 0,
+                        mindWanders: Number(arr[3]) || 0,
+                        rating: Number(arr[4]) || 5,
+                        date: arr[5] || new Date().toISOString(),
+                        clientDate: arr[6] || "Today",
+                        clientTime: arr[7] || ""
+                    }));
+                } else {
+                    sessionsToMerge = parsed;
+                }
+            }
+        } catch (e) {
+            console.warn("Failed to parse sync URL payload:", e);
+        }
+
+        if (sessionsToMerge.length > 0) {
+            const current = getSessions();
+            const merged = [...current];
+            let addedCount = 0;
+
+            sessionsToMerge.forEach(incoming => {
+                const exists = merged.some(s => 
+                    (s.date && incoming.date && s.date === incoming.date) ||
+                    (s.clientDate === incoming.clientDate && s.clientTime === incoming.clientTime && s.pattern === incoming.pattern)
+                );
+                if (!exists) {
+                    merged.push(incoming);
+                    addedCount++;
+                }
+            });
+
+            merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            localStorage.setItem("breathingSessions", JSON.stringify(merged.slice(0, 150)));
+            loadStats();
+
+            // Clean URL query parameters
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+
+            if (window.showNotificationToast) {
+                window.showNotificationToast(`🎉 Synced ${addedCount} practice sessions from your other device!`);
+            } else {
+                alert(`🎉 Successfully synced ${addedCount} practice sessions to this device!`);
+            }
+
+            // Sync with Firebase if available
+            if (window.PranaFirebase && typeof window.PranaFirebase.syncLocalSessionsToCloud === "function") {
+                window.PranaFirebase.syncLocalSessionsToCloud();
+            }
+        }
+    } catch (err) {
+        console.error("URL Sync error:", err);
+    }
+}
+
+function generateDeviceSyncUrl() {
+    const sessions = getSessions();
+    if (!sessions.length) return window.location.origin + window.location.pathname;
+    const compact = sessions.slice(0, 50).map(s => [
+        s.pattern || "4–6 Relaxation",
+        Number(s.duration) || 1,
+        Number(s.cycles) || 0,
+        Number(s.mindWanders) || 0,
+        Number(s.rating) || 5,
+        s.date || new Date().toISOString(),
+        s.clientDate || "Today",
+        s.clientTime || ""
+    ]);
+    const json = JSON.stringify(compact);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const baseUrl = window.location.origin + window.location.pathname;
+    return `${baseUrl}?sync=${b64}`;
+}
+
+function openDeviceSyncModal() {
+    const modal = document.getElementById("deviceSyncModal");
+    const syncUrlInput = document.getElementById("syncUrlInput");
+    const syncQrImg = document.getElementById("syncQrImg");
+    const syncCountEl = document.getElementById("syncSessionCount");
+
+    if (modal) {
+        const sessions = getSessions();
+        if (syncCountEl) syncCountEl.textContent = `${sessions.length} sessions`;
+
+        const syncUrl = generateDeviceSyncUrl();
+        if (syncUrlInput) syncUrlInput.value = syncUrl;
+
+        if (syncQrImg) {
+            syncQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(syncUrl)}`;
+        }
+
+        modal.classList.add("show");
+    }
+}
+
+function closeDeviceSyncModal() {
+    const modal = document.getElementById("deviceSyncModal");
+    if (modal) modal.classList.remove("show");
+}
+
+function copyDeviceSyncLink() {
+    const syncUrlInput = document.getElementById("syncUrlInput");
+    if (syncUrlInput) {
+        syncUrlInput.select();
+        syncUrlInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(syncUrlInput.value).then(() => {
+            if (window.showNotificationToast) {
+                window.showNotificationToast("📋 Magic Sync Link copied! Open on your 2nd laptop or phone to merge history.");
+            } else {
+                alert("📋 Sync Link copied to clipboard!");
+            }
+        }).catch(() => {
+            alert("Please copy the link manually from the input box.");
+        });
+    }
+}
+
+function exportJsonBackup() {
+    const sessions = getSessions();
+    const blob = new Blob([JSON.stringify(sessions, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pranaveda_sessions_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importJsonBackup(fileInput) {
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+                const current = getSessions();
+                const merged = [...current];
+                let count = 0;
+                imported.forEach(item => {
+                    const exists = merged.some(s => s.date === item.date);
+                    if (!exists) {
+                        merged.push(item);
+                        count++;
+                    }
+                });
+                merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                localStorage.setItem("breathingSessions", JSON.stringify(merged.slice(0, 150)));
+                loadStats();
+                if (window.showNotificationToast) {
+                    window.showNotificationToast(`🎉 Imported ${count} sessions successfully!`);
+                } else {
+                    alert(`Imported ${count} sessions!`);
+                }
+                closeDeviceSyncModal();
+            }
+        } catch (err) {
+            alert("Could not read backup file. Please ensure it is a valid JSON file.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+window.openDeviceSyncModal = openDeviceSyncModal;
+window.closeDeviceSyncModal = closeDeviceSyncModal;
+window.copyDeviceSyncLink = copyDeviceSyncLink;
+window.exportJsonBackup = exportJsonBackup;
+window.importJsonBackup = importJsonBackup;
+
 /* KEYBOARD SHORTCUTS */
 document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.target.tagName === "TEXTAREA") return;
     if (e.code === "Space") {
         e.preventDefault();
         if (running) pauseSession();
@@ -1602,6 +1791,7 @@ document.addEventListener("keydown", (e) => {
         document.body.classList.remove("zen-mode");
         guideModal.classList.remove("show");
         ratingModal.classList.remove("show");
+        closeDeviceSyncModal();
     }
 });
 
@@ -1612,6 +1802,7 @@ function init() {
     phases = getPattern();
     totalTimeText.textContent = formatTime(totalSeconds);
     secondsText.textContent = Math.ceil(totalSeconds / 60);
+    checkUrlSyncPayload();
     loadStats();
 }
 
@@ -1620,3 +1811,4 @@ if (typeof window !== 'undefined') {
 }
 
 init();
+

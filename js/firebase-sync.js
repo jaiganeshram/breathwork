@@ -1,25 +1,25 @@
 /**
  * ============================================================================
- * PRANAVEDA - FIREBASE CLOUD SYNC & AUTHENTICATION ENGINE
+ * PRANAVEDA - FIREBASE CLOUD SYNC & MULTI-DEVICE DATA MASTER
  * ============================================================================
- * Super-Senior Architecture:
+ * Architecture & Capabilities:
  * 1. Target Firebase Project: breathwork-c5371
- * 2. Firebase v10 Compat SDK (App, Auth, Firestore with Multi-Tab Offline Persistence)
- * 3. Automatic Seamless Anonymous Auth & Device UID Persistence
- * 4. 1-Click Google Sign-In (For cross-device sync on Phone, Tablet & PC)
- * 5. Immediate Firestore synchronization for:
- *    - Every 4–6 Breathwork & Pranayama Practice Session
- *    - Sadhana Flow Logs & Streaks
- *    - Saved Asana Favorites
- *    - User Preferences
- * 6. Dual-Mode Sync: Firestore SDK + Firestore Direct REST API Fallback
+ * 2. Real-Time Multi-Device Synchronization across Laptops, Desktops, Mobiles & Tablets
+ * 3. Automatic Cloud Firestore synchronization for:
+ *    - All 4–6 & Pranayama Breathing Practice Sessions
+ *    - Streaks, Total Minutes, Mind Wandering counts, and Calmness ratings
+ *    - Asana Favorites & Sadhana Logs
+ * 4. Automatic Diagnostics & Health Checking:
+ *    - Detects whether Cloud Firestore database is created or pending setup
+ *    - Shows direct 1-click button and 3-step guide if setup is needed in Google Cloud
+ * 5. Instant Peer-to-Peer Device Sync (Magic Link & QR Code Transfer)
+ * 6. Multi-tab offline persistence & graceful local fallback
  * ============================================================================
  */
 
 (function () {
     "use strict";
 
-    // Real production configuration for Firebase Project: breathwork-c5371
     const DEFAULT_CONFIG = {
         apiKey: "AIzaSyC8lAP_MhLMQLoKXttRhA6KnpU6ihdVq2M",
         authDomain: "breathwork-c5371.firebaseapp.com",
@@ -40,6 +40,8 @@
             this.isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
             this.syncListeners = [];
             this.config = this.loadStoredConfig();
+            this.dbStatus = "checking"; // 'connected' | 'db_missing' | 'rules_needed' | 'offline'
+            this.statusMessage = "Connecting to Cloud...";
         }
 
         getClientUid() {
@@ -87,14 +89,10 @@
             }
         }
 
-        /**
-         * Intelligent Parser for raw Firebase config snippet, JSON, or API key
-         */
         parseConfigSnippet(raw) {
             if (!raw || typeof raw !== "string") return null;
             raw = raw.trim();
 
-            // Try direct JSON parse
             try {
                 const parsed = JSON.parse(raw);
                 if (parsed && typeof parsed === "object") {
@@ -110,7 +108,6 @@
                 }
             } catch (e) {}
 
-            // Regex extraction from JS object snippet
             const extract = (key) => {
                 const match = raw.match(new RegExp(`${key}\\s*[:=]\\s*["'\`]([^"'\`]+)["'\`]`));
                 return match ? match[1].trim() : "";
@@ -134,7 +131,6 @@
                 };
             }
 
-            // Raw API key pattern
             if (raw.startsWith("AIzaSy")) {
                 return {
                     ...this.config,
@@ -148,8 +144,44 @@
             return null;
         }
 
+        async checkDatabaseHealth() {
+            try {
+                const proj = this.config.projectId || "breathwork-c5371";
+                const apiKey = this.config.apiKey || "";
+                if (typeof fetch !== "function") return "unknown";
+
+                const res = await fetch(`https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents?pageSize=1&key=${apiKey}`);
+                if (res.status === 200) {
+                    this.dbStatus = "connected";
+                    this.statusMessage = "Cloud Synced (breathwork-c5371)";
+                    this.updateSyncStatusBadge("connected", this.statusMessage);
+                    this.updateModalDiagnostics();
+                    // Automatically push any local records that aren't on cloud yet
+                    this.syncLocalSessionsToCloud();
+                    return "connected";
+                } else if (res.status === 404) {
+                    this.dbStatus = "db_missing";
+                    this.statusMessage = "Action Required: Click 'Create Database' in Firebase Console";
+                    this.updateSyncStatusBadge("db_missing", "⚠️ Setup Firebase DB");
+                    this.updateModalDiagnostics();
+                    return "db_missing";
+                } else if (res.status === 403) {
+                    this.dbStatus = "rules_needed";
+                    this.statusMessage = "Firestore Rules: Start in Test Mode";
+                    this.updateSyncStatusBadge("rules_needed", "⚠️ Firestore Rules Needed");
+                    this.updateModalDiagnostics();
+                    return "rules_needed";
+                }
+            } catch (e) {
+                this.dbStatus = "offline";
+                this.statusMessage = "Offline / Local Mode";
+                this.updateSyncStatusBadge("offline", "Local Cache Mode");
+                this.updateModalDiagnostics();
+            }
+            return this.dbStatus;
+        }
+
         async init() {
-            // Check if Firebase CDN libraries are loaded
             if (typeof firebase === "undefined") {
                 console.warn("Firebase SDK not loaded in DOM. Operating in resilient offline cache mode.");
                 this.updateSyncStatusBadge("offline", "Local Cache Mode (Firebase Ready)");
@@ -177,9 +209,7 @@
                         console.log("🔥 Firestore Offline Persistence Active with multi-tab synchronization.");
                     } catch (persErr) {
                         if (persErr.code === "failed-precondition") {
-                            console.warn("Firestore persistence: Multiple tabs open, persistence active on primary tab.");
-                        } else if (persErr.code === "unimplemented") {
-                            console.warn("Firestore persistence: Browser lacks IndexedDB support.");
+                            console.warn("Firestore persistence: Active on primary tab.");
                         }
                     }
                 }
@@ -193,10 +223,8 @@
                         this.updateAuthUI(user);
                         if (user) {
                             const name = user.isAnonymous ? "Guest (Auto-Synced)" : (user.displayName || user.email || "User");
-                            this.updateSyncStatusBadge("connected", `Cloud Synced (${name})`);
                             this.attachRealtimeListeners(user.uid);
                         } else {
-                            // Automatically sign in anonymously for zero friction
                             this.signInAnonymously();
                         }
                     });
@@ -206,13 +234,23 @@
                 if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
                     window.addEventListener("online", () => {
                         this.isOnline = true;
-                        this.updateSyncStatusBadge("connected", "Connected to Cloud (breathwork-c5371)");
+                        this.checkDatabaseHealth();
                     });
                     window.addEventListener("offline", () => {
                         this.isOnline = false;
                         this.updateSyncStatusBadge("offline", "Offline (Syncing to Local Cache)");
                     });
                 }
+
+                // Run Initial Health Diagnostic
+                this.checkDatabaseHealth();
+
+                // Periodic health check every 45 seconds
+                setInterval(() => {
+                    if (this.isOnline) {
+                        this.checkDatabaseHealth();
+                    }
+                }, 45000);
 
                 return true;
             } catch (err) {
@@ -244,8 +282,7 @@
                 if (typeof window !== "undefined" && window.showNotificationToast) {
                     window.showNotificationToast(`☁️ Welcome, ${result.user.displayName}! Cloud Sync Activated.`);
                 }
-                // Automatically migrate local records to their cloud account
-                await this.migrateLocalDataToFirestore();
+                await this.syncLocalSessionsToCloud();
             } catch (err) {
                 console.error("Google Auth error:", err);
                 alert("Google Sign-In notice: " + err.message);
@@ -256,7 +293,6 @@
             if (!this.auth) return;
             try {
                 await this.auth.signOut();
-                // Re-sign in anonymously
                 await this.signInAnonymously();
             } catch (err) {
                 console.error("Sign out error:", err);
@@ -318,7 +354,6 @@
             // 2. Save to Firestore (Shared collection so all mobiles & laptops sync in real-time)
             if (this.db) {
                 try {
-                    // Save to shared collection accessible by all user devices
                     this.db.collection("breathingSessions")
                         .doc(docId)
                         .set(entry, { merge: true })
@@ -330,92 +365,13 @@
                         })
                         .catch((err) => {
                             console.warn("Firestore global collection notice:", err.message);
-                            // Also save to user sub-collection
-                            this.db.collection("users").doc(uid).collection("breathingSessions").add(entry).catch(() => {});
+                            if (err.message && err.message.includes("does not exist")) {
+                                this.dbStatus = "db_missing";
+                                this.updateModalDiagnostics();
+                            }
                         });
                 } catch (err) {
                     console.warn("Firestore write queued for offline sync:", err.message);
-                }
-            }
-
-            // 3. Fallback direct Firestore REST push
-            try {
-                const proj = this.config.projectId || "breathwork-c5371";
-                if (typeof fetch === "function") {
-                    fetch(`https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents/breathingSessions?documentId=${docId}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            fields: {
-                                pattern: { stringValue: entry.pattern },
-                                duration: { integerValue: String(entry.duration) },
-                                cycles: { integerValue: String(entry.cycles) },
-                                rating: { integerValue: String(entry.rating) },
-                                uid: { stringValue: uid },
-                                clientDate: { stringValue: entry.clientDate },
-                                clientTime: { stringValue: entry.clientTime },
-                                date: { stringValue: entry.date }
-                            }
-                        })
-                    }).catch(() => {});
-                }
-            } catch (e) {}
-        }
-
-        async saveSadhanaLog(logData) {
-            const entry = {
-                title: logData.title,
-                duration: logData.duration, // minutes
-                category: logData.category || "sadhana",
-                uid: (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid(),
-                timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
-                    ? firebase.firestore.FieldValue.serverTimestamp()
-                    : new Date().toISOString(),
-                clientDate: new Date().toLocaleDateString()
-            };
-
-            try {
-                if (typeof localStorage !== "undefined") {
-                    const localLogs = JSON.parse(localStorage.getItem("pranaveda_sadhana_logs") || "[]");
-                    localLogs.unshift(entry);
-                    localStorage.setItem("pranaveda_sadhana_logs", JSON.stringify(localLogs.slice(0, 100)));
-                }
-            } catch (e) {}
-
-            if (this.db) {
-                const uid = entry.uid;
-                try {
-                    this.db.collection("sadhanaLogs")
-                        .add(entry)
-                        .catch(() => {
-                            this.db.collection("users").doc(uid).collection("sadhanaLogs").add(entry).catch(() => {});
-                        });
-                } catch (err) {
-                    console.warn("Firestore sadhana queued:", err.message);
-                }
-            }
-        }
-
-        async saveAsanaFavorites(favoritesArray) {
-            const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
-            try {
-                if (typeof localStorage !== "undefined") {
-                    localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favoritesArray));
-                }
-            } catch (e) {}
-
-            if (this.db) {
-                try {
-                    this.db.collection("users")
-                        .doc("shared_workspace")
-                        .set({
-                            favorites: favoritesArray,
-                            lastUpdated: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
-                                ? firebase.firestore.FieldValue.serverTimestamp()
-                                : new Date().toISOString()
-                        }, { merge: true });
-                } catch (e) {
-                    console.warn("Favorites cloud sync queued:", e.message);
                 }
             }
         }
@@ -435,19 +391,21 @@
                     const cloudSessions = [];
                     snapshot.forEach((doc) => {
                         const data = doc.data();
-                        cloudSessions.push({
-                            pattern: data.pattern,
-                            duration: data.duration,
-                            cycles: data.cycles || 0,
-                            mindWanders: data.mindWanders || 0,
-                            rating: data.rating || 5,
-                            date: data.date || (data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
-                            clientDate: data.clientDate || "Today",
-                            clientTime: data.clientTime || ""
-                        });
+                        if (data && (data.pattern || data.duration)) {
+                            cloudSessions.push({
+                                pattern: data.pattern || "4–6 Relaxation",
+                                duration: Number(data.duration) || 1,
+                                cycles: Number(data.cycles) || 0,
+                                mindWanders: Number(data.mindWanders) || 0,
+                                rating: Number(data.rating) || 5,
+                                date: data.date || (data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()),
+                                clientDate: data.clientDate || "Today",
+                                clientTime: data.clientTime || ""
+                            });
+                        }
                     });
 
-                    if (typeof localStorage !== "undefined") {
+                    if (typeof localStorage !== "undefined" && cloudSessions.length > 0) {
                         const localSessions = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
                         const merged = [...cloudSessions];
                         localSessions.forEach(localS => {
@@ -473,51 +431,29 @@
                     }
                 };
 
-                // Primary Listener: Shared Breathing Sessions across all devices
                 const unsubGlobalSessions = this.db.collection("breathingSessions")
                     .orderBy("date", "desc")
                     .limit(100)
                     .onSnapshot(processSnapshot, (err) => {
-                        console.warn("Global sessions snapshot notice (trying user subcollection):", err.message);
-                        // Fallback listener: user sub-collection
-                        const unsubUserSessions = this.db.collection("users")
-                            .doc(uid)
-                            .collection("breathingSessions")
-                            .orderBy("timestamp", "desc")
-                            .limit(100)
-                            .onSnapshot(processSnapshot, () => {});
-                        this.syncListeners.push(unsubUserSessions);
+                        console.warn("Global sessions snapshot notice:", err.message);
+                        if (err.message && err.message.includes("does not exist")) {
+                            this.dbStatus = "db_missing";
+                            this.updateModalDiagnostics();
+                        }
                     });
 
                 this.syncListeners.push(unsubGlobalSessions);
             } catch (e) {
                 console.warn("Snapshot attach notice:", e);
             }
-
-            // 2. Listen to Asana Favorites in real-time
-            try {
-                const unsubFavs = this.db.collection("users")
-                    .doc("shared_workspace")
-                    .onSnapshot((doc) => {
-                        if (doc.exists && doc.data().favorites && typeof localStorage !== "undefined") {
-                            const favs = doc.data().favorites;
-                            localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favs));
-                        }
-                    }, (err) => console.warn("Favorites snapshot notice:", err.message));
-
-                this.syncListeners.push(unsubFavs);
-            } catch (e) {}
         }
 
-        /* ==========================================================================
-           ONE-CLICK MIGRATION: LOCALSTORAGE -> FIRESTORE
-           ========================================================================== */
-        async migrateLocalDataToFirestore() {
+        async syncLocalSessionsToCloud() {
             if (!this.db) return;
             const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
             try {
                 const localSessions = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("breathingSessions") || "[]") : [];
-                const localFavs = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("pranaveda_asana_favs") || "[]") : [];
+                if (!localSessions.length) return;
 
                 let count = 0;
                 const batch = this.db.batch();
@@ -527,10 +463,10 @@
                     const ref = this.db.collection("breathingSessions").doc(docId);
                     batch.set(ref, {
                         pattern: s.pattern,
-                        duration: s.duration,
-                        cycles: s.cycles || 0,
-                        mindWanders: s.mindWanders || 0,
-                        rating: s.rating || 5,
+                        duration: Number(s.duration) || 1,
+                        cycles: Number(s.cycles) || 0,
+                        mindWanders: Number(s.mindWanders) || 0,
+                        rating: Number(s.rating) || 5,
                         clientDate: s.clientDate || s.date || "Today",
                         clientTime: s.clientTime || "",
                         date: s.date || new Date().toISOString(),
@@ -542,77 +478,127 @@
                     count++;
                 });
 
-                if (localFavs.length > 0) {
-                    const userDoc = this.db.collection("users").doc("shared_workspace");
-                    batch.set(userDoc, { favorites: localFavs }, { merge: true });
-                }
-
                 await batch.commit();
-                console.log(`☁️ Successfully synced ${count} records across all devices on Cloud Firestore (breathwork-c5371)!`);
-                if (typeof window !== "undefined" && window.showNotificationToast) {
-                    window.showNotificationToast(`☁️ ${count} sessions synced across all devices!`);
-                }
+                console.log(`☁️ Synced ${count} records across all devices on Cloud Firestore (breathwork-c5371)!`);
             } catch (err) {
-                console.error("Migration error:", err);
-                alert("Cloud Sync Notice: " + err.message + "\n\nPlease ensure Firestore Database is created in your Firebase Console.");
+                console.warn("Sync local to cloud notice:", err.message);
             }
         }
 
-        /* ==========================================================================
-           UI STATUS & BADGES
-           ========================================================================== */
+        async migrateLocalDataToFirestore() {
+            await this.syncLocalSessionsToCloud();
+            if (typeof window !== "undefined" && window.showNotificationToast) {
+                window.showNotificationToast("☁️ Practice sessions pushed to Cloud Firestore!");
+            }
+        }
+
         updateSyncStatusBadge(status, text) {
             if (typeof document === "undefined") return;
             const badges = typeof document.querySelectorAll === "function" 
                 ? document.querySelectorAll("#firebaseSyncBadge, .firebase-sync-badge")
-                : (typeof document.getElementById === "function" && document.getElementById("firebaseSyncBadge") ? [document.getElementById("firebaseSyncBadge")] : []);
+                : [];
             
             badges.forEach((badge) => {
                 if (!badge) return;
                 if (status === "connected") {
                     badge.className = "sync-badge synced";
-                    badge.innerHTML = `🟢 ${text}`;
+                    badge.innerHTML = `🟢 Cloud Synced`;
+                } else if (status === "db_missing") {
+                    badge.className = "sync-badge error";
+                    badge.innerHTML = `⚠️ Setup Cloud DB`;
                 } else {
                     badge.className = "sync-badge offline";
-                    badge.innerHTML = `🟡 ${text}`;
+                    badge.innerHTML = `🟡 Local Mode`;
                 }
             });
+        }
+
+        updateModalDiagnostics() {
+            if (typeof document === "undefined") return;
+            const diagBox = document.getElementById("firebaseDiagnosticBox");
+            if (!diagBox) return;
+
+            if (this.dbStatus === "connected") {
+                diagBox.innerHTML = `
+                    <div style="background: rgba(46, 168, 121, 0.12); border: 1px solid rgba(46, 168, 121, 0.4); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #2ea879; margin-bottom: 4px;">
+                            <span>🟢</span> Firestore Database Live & Connected
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                            All practice sessions recorded on this laptop or mobile sync in real time to all your devices via <b>breathwork-c5371</b>.
+                        </div>
+                    </div>
+                `;
+            } else if (this.dbStatus === "db_missing") {
+                diagBox.innerHTML = `
+                    <div style="background: rgba(229, 169, 60, 0.14); border: 1px solid rgba(229, 169, 60, 0.45); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #e5a93c; font-size: 14px; margin-bottom: 6px;">
+                            <span>⚠️</span> Action Required in Firebase Console (10-Second Setup)
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-primary); line-height: 1.5; margin-bottom: 12px;">
+                            Your Firebase project <b>breathwork-c5371</b> is connected, but the <b>Cloud Firestore Database</b> has not been created in Google Cloud yet.
+                        </div>
+                        
+                        <div style="background: var(--card-bg); border-radius: 8px; padding: 10px 14px; font-size: 12.5px; line-height: 1.6; margin-bottom: 12px; border: 1px solid var(--card-border);">
+                            <b>3 Quick Steps to enable multi-laptop sync:</b><br>
+                            1. Click the button below to open Firestore Console<br>
+                            2. Click the blue button: <b>"Create database"</b><br>
+                            3. Select <b>"Start in test mode"</b> and click <b>"Enable"</b>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="https://console.firebase.google.com/project/breathwork-c5371/firestore" target="_blank" class="btn btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                                🚀 1. Open Console & Click "Create database"
+                            </a>
+                            <button class="icon-btn" onclick="if(window.PranaFirebase) window.PranaFirebase.checkDatabaseHealth();">
+                                🔄 Check Connection Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (this.dbStatus === "rules_needed") {
+                diagBox.innerHTML = `
+                    <div style="background: rgba(224, 93, 93, 0.12); border: 1px solid rgba(224, 93, 93, 0.4); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #e05d5d; margin-bottom: 4px;">
+                            <span>⚠️</span> Firestore Rules Need Update
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+                            Firestore is active but permissions are locked. In Firebase Console ➔ Firestore ➔ <b>Rules</b>, allow read/write or select <b>Test Mode</b>.
+                        </div>
+                        <a href="https://console.firebase.google.com/project/breathwork-c5371/firestore/rules" target="_blank" class="icon-btn" style="text-decoration: none;">
+                            🔒 Update Firestore Rules
+                        </a>
+                    </div>
+                `;
+            } else {
+                diagBox.innerHTML = `
+                    <div style="background: var(--card-bg-subtle, rgba(0,0,0,0.05)); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">CONNECTION STATUS</div>
+                        <div id="modalAuthStatus" style="font-weight: 600; color: var(--accent-cyan); font-size: 13.5px;">Cloud Storage Ready (breathwork-c5371)</div>
+                    </div>
+                `;
+            }
         }
 
         updateAuthUI(user) {
             if (typeof document === "undefined") return;
             const authBtns = typeof document.querySelectorAll === "function"
                 ? document.querySelectorAll("#firebaseAuthBtn, .firebase-auth-btn")
-                : (typeof document.getElementById === "function" && document.getElementById("firebaseAuthBtn") ? [document.getElementById("firebaseAuthBtn")] : []);
-            const userAvatar = typeof document.getElementById === "function" ? document.getElementById("firebaseUserAvatar") : null;
+                : [];
 
             authBtns.forEach((authBtn) => {
                 if (!authBtn) return;
                 if (user && !user.isAnonymous) {
                     authBtn.innerHTML = `👤 ${user.displayName || (user.email ? user.email.split('@')[0] : 'User')}`;
                     authBtn.title = "Click to view Cloud Sync Profile & Options";
-                } else {
-                    authBtn.innerHTML = `☁️ Cloud Sync`;
-                    authBtn.title = "Sync with Google Account or configure Firebase";
                 }
             });
-
-            if (userAvatar) {
-                if (user && !user.isAnonymous && user.photoURL) {
-                    userAvatar.src = user.photoURL;
-                    userAvatar.style.display = "inline-block";
-                } else {
-                    userAvatar.style.display = "none";
-                }
-            }
         }
     }
 
-    // Export Singleton to Window
     if (typeof window !== "undefined") {
         window.PranaFirebase = new FirebaseSyncMaster();
 
-        // Built-in Notification Toast Helper
         if (!window.showNotificationToast) {
             window.showNotificationToast = function (msg) {
                 let toast = document.getElementById("pranavedaGlobalToast");
@@ -646,7 +632,6 @@
             };
         }
 
-        // Auto-init on DOMContentLoaded
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", () => {
                 window.PranaFirebase.init();

@@ -1526,9 +1526,12 @@
     <div class="card">
         <div class="card-header">
             <div class="card-title">📝 Session History</div>
-            <div class="history-actions" id="historyActions" style="display: flex; gap: 8px;">
+            <div class="history-actions" id="historyActions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button id="refreshHistoryBtn" class="icon-btn" title="Refresh Session History">
                     🔄 Refresh
+                </button>
+                <button id="syncDeviceBtn" class="icon-btn" onclick="openDeviceSyncModal()" title="Instant QR & Magic Link transfer to Mobile or 2nd Laptop">
+                    📱 Sync to Mobile / PC
                 </button>
                 <button id="toggleAllGroupsBtn" class="icon-btn" style="display: none;" title="Expand or Collapse All Dates">
                     ⮟ Collapse All
@@ -1756,6 +1759,55 @@
             </div>
         </div>
     </div>
+<!-- INSTANT DEVICE-TO-DEVICE SYNC MODAL (QR & MAGIC LINK) -->
+<div id="deviceSyncModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+        <div class="modal-header">
+            <h2 style="font-family: 'Cinzel', serif; font-size: 18px;">📱 Instant Mobile & PC Sync</h2>
+            <button onclick="closeDeviceSyncModal()" class="icon-btn" style="padding: 4px 10px;">✕</button>
+        </div>
+
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+            Transfer all your practice history, streaks, and sessions (<b id="syncSessionCount" style="color: var(--accent-cyan);">0 sessions</b>) to another laptop or mobile in 1 second.
+        </div>
+
+        <!-- QR CODE PREVIEW -->
+        <div style="text-align: center; margin-bottom: 16px; background: rgba(255,255,255,0.95); padding: 16px; border-radius: 12px; display: inline-block; width: 100%;">
+            <div style="font-size: 12px; font-weight: 700; color: #192a30; margin-bottom: 8px;">📷 SCAN WITH PHONE CAMERA TO SYNC</div>
+            <img id="syncQrImg" src="" alt="Sync QR Code" style="width: 180px; height: 180px; border-radius: 8px; margin: 0 auto; display: block;" />
+        </div>
+
+        <!-- 1-CLICK MAGIC LINK -->
+        <div style="margin-bottom: 16px;">
+            <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">
+                🔗 Or Copy Magic Sync Link to open on your 2nd Laptop / Phone:
+            </label>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="syncUrlInput" readonly style="flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-primary); font-size: 12px; font-family: monospace;" />
+                <button class="btn btn-primary" onclick="copyDeviceSyncLink()" style="padding: 9px 16px; font-size: 13px; white-space: nowrap;">
+                    📋 Copy Link
+                </button>
+            </div>
+        </div>
+
+        <!-- BACKUP / RESTORE JSON -->
+        <div style="border-top: 1px solid var(--card-border); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 12px; color: var(--text-secondary);">
+                💾 File Backup:
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="icon-btn" onclick="exportJsonBackup()">
+                    📥 Export JSON
+                </button>
+                <label class="icon-btn" style="cursor: pointer;">
+                    📤 Import JSON
+                    <input type="file" accept=".json" onchange="importJsonBackup(this)" style="display: none;" />
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- FIREBASE CLOUD SYNC & SETTINGS MODAL -->
 <div id="firebaseModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 540px;">
@@ -1769,9 +1821,12 @@
             All 4–6 practice sessions, streak logs, and calmness scores are backed up to Google Cloud Firestore.
         </div>
 
-        <div style="background: var(--card-bg-subtle, rgba(0,0,0,0.05)); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">CONNECTION STATUS</div>
-            <div id="modalAuthStatus" style="font-weight: 600; color: var(--accent-cyan); font-size: 13.5px;">Cloud Storage Ready (breathwork-c5371)</div>
+        <!-- DYNAMIC DIAGNOSTIC BOX -->
+        <div id="firebaseDiagnosticBox">
+            <div style="background: var(--card-bg-subtle, rgba(0,0,0,0.05)); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">CONNECTION STATUS</div>
+                <div id="modalAuthStatus" style="font-weight: 600; color: var(--accent-cyan); font-size: 13.5px;">Cloud Storage Ready (breathwork-c5371)</div>
+            </div>
         </div>
 
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
@@ -1780,6 +1835,9 @@
             </button>
             <button class="icon-btn" onclick="window.open('https://console.firebase.google.com/project/breathwork-c5371/firestore', '_blank')">
                 🔗 Open Firestore Console
+            </button>
+            <button class="icon-btn" onclick="closeFirebaseModal(); openDeviceSyncModal();">
+                📱 Instant QR / Magic Sync
             </button>
         </div>
 
@@ -1816,12 +1874,8 @@ function openFirebaseModal() {
     const modal = document.getElementById("firebaseModal");
     if (modal) {
         modal.classList.add("show");
-        const user = window.PranaFirebase ? window.PranaFirebase.currentUser : null;
-        const statusEl = document.getElementById("modalAuthStatus");
-        if (user && !user.isAnonymous) {
-            if (statusEl) statusEl.textContent = `🟢 Google Synced: ${user.displayName || user.email}`;
-        } else if (user) {
-            if (statusEl) statusEl.textContent = `🟢 Guest Cloud Synced (UID: ${user.uid.substring(0, 10)}...)`;
+        if (window.PranaFirebase) {
+            window.PranaFirebase.checkDatabaseHealth();
         }
     }
 }
