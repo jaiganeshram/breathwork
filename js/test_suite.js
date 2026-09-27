@@ -11,6 +11,7 @@ const ids = [
     'ratingModal', 'ratingModalTitle', 'saveRatingBtn', 'guideModal', 'guideBtn', 'closeGuideBtn',
     'zenBtn', 'zenExitBtn', 'themeBtn', 'fullscreenBtn',
     'history', 'historyActions', 'refreshHistoryBtn', 'toggleAllGroupsBtn', 'clearHistoryBtn', 'exportCsvBtn',
+    'allowDeleteToggle',
     'todaySessions', 'totalMinutes', 'totalSessions', 'avgCalm', 'totalWanders', 'streakBadge',
     'badge1', 'badge2', 'badge3', 'badge4', 'badge5',
 

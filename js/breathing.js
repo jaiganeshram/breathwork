@@ -248,6 +248,7 @@ const refreshHistoryBtn = document.getElementById("refreshHistoryBtn");
 const toggleAllGroupsBtn = document.getElementById("toggleAllGroupsBtn");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
+const allowDeleteToggle = document.getElementById("allowDeleteToggle");
 
 /* STATE */
 let phases = [];
@@ -1029,6 +1030,15 @@ const savedBell = localStorage.getItem("pranaveda_bellSound") || "off";
 ambientSelect.value = savedAmbient;
 bellSelect.value = savedBell;
 
+if (allowDeleteToggle) {
+    const savedAllowDelete = localStorage.getItem("pranaveda_allow_delete") || "off";
+    allowDeleteToggle.value = savedAllowDelete;
+    allowDeleteToggle.addEventListener("change", () => {
+        localStorage.setItem("pranaveda_allow_delete", allowDeleteToggle.value);
+        loadStats();
+    });
+}
+
 breathSphere.addEventListener("click", () => {
     if (running) pauseSession();
     else startSession();
@@ -1275,11 +1285,13 @@ function loadStats() {
         return;
     }
 
+    const isDeleteEnabled = allowDeleteToggle ? allowDeleteToggle.value === "on" : (localStorage.getItem("pranaveda_allow_delete") === "on");
+
     if (historyActions) historyActions.style.display = "flex";
     if (refreshHistoryBtn) refreshHistoryBtn.style.display = "inline-flex";
     if (toggleAllGroupsBtn) toggleAllGroupsBtn.style.display = "inline-flex";
     if (exportCsvBtn) exportCsvBtn.style.display = "inline-flex";
-    if (clearHistoryBtn) clearHistoryBtn.style.display = "inline-flex";
+    if (clearHistoryBtn) clearHistoryBtn.style.display = isDeleteEnabled ? "inline-flex" : "none";
 
     // Map each session with originalIndex so deletions reference exact index
     const sessionsWithIndex = sessions.map((s, idx) => ({ ...s, originalIndex: idx }));
@@ -1360,9 +1372,10 @@ function loadStats() {
                                 🧠 ${dayWanders}
                             </span>` : ''}
                         </div>
+                        ${isDeleteEnabled ? `
                         <button class="btn-delete-group" title="Delete all records for ${dateMeta.title}" onclick="event.stopPropagation(); deleteDateGroup('${k}', '${dateMeta.title}')">
                             🗑️
-                        </button>
+                        </button>` : ''}
                     </div>
                 </div>
 
@@ -1376,7 +1389,7 @@ function loadStats() {
                                     <th>Duration</th>
                                     <th>Mind Wanders</th>
                                     <th>Calmness</th>
-                                    <th style="width: 45px; text-align: center;"></th>
+                                    ${isDeleteEnabled ? `<th style="width: 45px; text-align: center;"></th>` : ''}
                                 </tr>
                             </thead>
                             <tbody>
@@ -1407,11 +1420,12 @@ function loadStats() {
                                                     : `<span style="color: var(--text-muted);">—</span>`
                                                 }
                                             </td>
+                                            ${isDeleteEnabled ? `
                                             <td style="text-align: center;">
                                                 <button class="btn-delete-row" title="Delete session" onclick="deleteSession(${s.originalIndex})">
                                                     ✕
                                                 </button>
-                                            </td>
+                                            </td>` : ''}
                                         </tr>
                                     `;
                                 }).join("")}
@@ -1466,9 +1480,13 @@ if (toggleAllGroupsBtn) {
 window.deleteDateGroup = function(dateKeyStr, title) {
     if (confirm(`Are you sure you want to delete all Pranayama sessions recorded on ${title}?`)) {
         const sessions = getSessions();
+        const toDelete = sessions.filter(s => (dateKey(s.date) || 'unknown') === dateKeyStr);
         const updated = sessions.filter(s => (dateKey(s.date) || 'unknown') !== dateKeyStr);
         localStorage.setItem("breathingSessions", JSON.stringify(updated));
         collapsedDateGroups.delete(dateKeyStr);
+        if (window.PranaFirebase) {
+            toDelete.forEach(s => window.PranaFirebase.deleteSessionFromCloud(s.date));
+        }
         loadStats();
     }
 };
@@ -1476,8 +1494,11 @@ window.deleteDateGroup = function(dateKeyStr, title) {
 window.deleteSession = function(index) {
     const sessions = getSessions();
     if (index >= 0 && index < sessions.length) {
-        sessions.splice(index, 1);
+        const removed = sessions.splice(index, 1)[0];
         localStorage.setItem("breathingSessions", JSON.stringify(sessions));
+        if (removed && window.PranaFirebase) {
+            window.PranaFirebase.deleteSessionFromCloud(removed.date);
+        }
         loadStats();
     }
 };
@@ -1489,7 +1510,7 @@ if (refreshHistoryBtn) {
         }
         loadStats();
         if (typeof window.showNotificationToast === "function") {
-            window.showNotificationToast("🔄 History Refreshed from Cloud");
+            window.showNotificationToast("🔄 History Refreshed from Firebase");
         }
     });
 }
@@ -1498,6 +1519,9 @@ clearHistoryBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to clear your entire Pranayama history?")) {
         localStorage.removeItem("breathingSessions");
         collapsedDateGroups.clear();
+        if (window.PranaFirebase) {
+            window.PranaFirebase.clearAllFromCloud();
+        }
         loadStats();
     }
 });

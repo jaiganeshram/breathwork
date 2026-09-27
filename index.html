@@ -1358,6 +1358,14 @@
                     <option value="bell">✨ Crystal Tingsha Chime</option>
                 </select>
             </div>
+
+            <div class="control-group">
+                <label for="allowDeleteToggle">History Deletion</label>
+                <select id="allowDeleteToggle">
+                    <option value="off" selected>🔒 Disabled (Protected)</option>
+                    <option value="on">🔓 Enable Delete Option</option>
+                </select>
+            </div>
         </div>
 
         <!-- Dynamic Technique Guidance Banner -->
@@ -1755,7 +1763,10 @@
     </div>
 
 
-<!-- CLOUD ENGINE & APPLICATION SCRIPTS -->
+<!-- FIREBASE SDK & APPLICATION SCRIPTS -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase-sync.js"></script>
 <script src="js/breathing.js"></script>
 </body>
