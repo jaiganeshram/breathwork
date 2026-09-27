@@ -5,14 +5,14 @@
  * Super-Senior Architecture:
  * 1. Target Firebase Project: breathwork-c5371
  * 2. Firebase v10 Compat SDK (App, Auth, Firestore with Multi-Tab Offline Persistence)
- * 3. Automatic Seamless Anonymous Auth (Zero-friction instant cloud storage)
+ * 3. Automatic Seamless Anonymous Auth & Device UID Persistence
  * 4. 1-Click Google Sign-In (For cross-device sync on Phone, Tablet & PC)
- * 5. Real-time Firestore synchronization for:
- *    - 4–6 Breathwork & Pranayama History
+ * 5. Immediate Firestore synchronization for:
+ *    - Every 4–6 Breathwork & Pranayama Practice Session
  *    - Sadhana Flow Logs & Streaks
  *    - Saved Asana Favorites
  *    - User Preferences
- * 6. Automatic 1-Click Migration from LocalStorage to Cloud Firestore
+ * 6. Dual-Mode Sync: Firestore SDK + Firestore Direct REST API Fallback
  * ============================================================================
  */
 
@@ -39,6 +39,20 @@
             this.isOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
             this.syncListeners = [];
             this.config = this.loadStoredConfig();
+        }
+
+        getClientUid() {
+            try {
+                if (typeof localStorage !== "undefined") {
+                    let uid = localStorage.getItem("pranaveda_client_uid");
+                    if (!uid) {
+                        uid = "yogi_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now().toString(36);
+                        localStorage.setItem("pranaveda_client_uid", uid);
+                    }
+                    return uid;
+                }
+            } catch (e) {}
+            return "guest_yogi";
         }
 
         loadStoredConfig() {
@@ -256,6 +270,7 @@
             const nowIso = new Date().toISOString();
             const clientDate = new Date().toLocaleDateString();
             const clientTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
 
             const entry = {
                 pattern: patternName,
@@ -263,6 +278,7 @@
                 cycles: cyclesCount,
                 mindWanders: mindCount,
                 rating: ratingVal,
+                uid: uid,
                 vagalCoherence: sessionData.vagalCoherence || "98.5%",
                 timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
                     ? firebase.firestore.FieldValue.serverTimestamp()
@@ -273,7 +289,7 @@
                 type: sessionData.type || "Pranayama"
             };
 
-            // Always save to localStorage as instant offline fallback
+            // 1. Always save to localStorage immediately for instant offline reliability
             try {
                 if (typeof localStorage !== "undefined") {
                     const local = JSON.parse(localStorage.getItem("breathingSessions") || "[]");
@@ -291,18 +307,52 @@
                 }
             } catch (e) {}
 
-            // Save to Firestore if available
-            if (this.db && this.currentUser) {
+            // 2. Save to Firestore via SDK
+            if (this.db) {
                 try {
-                    await this.db.collection("users")
-                        .doc(this.currentUser.uid)
+                    // Save to user sub-collection
+                    this.db.collection("users")
+                        .doc(uid)
                         .collection("breathingSessions")
-                        .add(entry);
-                    console.log("☁️ Session synced to Firestore under project breathwork-c5371.");
+                        .add(entry)
+                        .then(() => {
+                            console.log("☁️ [Firebase] 4-6 Session saved to Firestore (breathwork-c5371)!");
+                            if (typeof window !== "undefined" && window.showNotificationToast) {
+                                window.showNotificationToast("☁️ 4–6 Practice Saved to Firebase History!");
+                            }
+                        })
+                        .catch((err) => {
+                            console.warn("Firestore user doc write notice:", err.message);
+                            // Fallback to top-level collection
+                            this.db.collection("breathingSessions").add(entry).catch(() => {});
+                        });
                 } catch (err) {
                     console.warn("Firestore write queued for offline sync:", err.message);
                 }
             }
+
+            // 3. Fallback direct Firestore REST push
+            try {
+                const proj = this.config.projectId || "breathwork-c5371";
+                if (typeof fetch === "function") {
+                    fetch(`https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents/breathingSessions`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            fields: {
+                                pattern: { stringValue: entry.pattern },
+                                duration: { integerValue: String(entry.duration) },
+                                cycles: { integerValue: String(entry.cycles) },
+                                rating: { integerValue: String(entry.rating) },
+                                uid: { stringValue: uid },
+                                clientDate: { stringValue: entry.clientDate },
+                                clientTime: { stringValue: entry.clientTime },
+                                date: { stringValue: entry.date }
+                            }
+                        })
+                    }).catch(() => {});
+                }
+            } catch (e) {}
         }
 
         async saveSadhanaLog(logData) {
@@ -310,6 +360,7 @@
                 title: logData.title,
                 duration: logData.duration, // minutes
                 category: logData.category || "sadhana",
+                uid: (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid(),
                 timestamp: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
                     ? firebase.firestore.FieldValue.serverTimestamp()
                     : new Date().toISOString(),
@@ -324,12 +375,16 @@
                 }
             } catch (e) {}
 
-            if (this.db && this.currentUser) {
+            if (this.db) {
+                const uid = entry.uid;
                 try {
-                    await this.db.collection("users")
-                        .doc(this.currentUser.uid)
+                    this.db.collection("users")
+                        .doc(uid)
                         .collection("sadhanaLogs")
-                        .add(entry);
+                        .add(entry)
+                        .catch(() => {
+                            this.db.collection("sadhanaLogs").add(entry).catch(() => {});
+                        });
                 } catch (err) {
                     console.warn("Firestore sadhana queued:", err.message);
                 }
@@ -337,16 +392,17 @@
         }
 
         async saveAsanaFavorites(favoritesArray) {
+            const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
             try {
                 if (typeof localStorage !== "undefined") {
                     localStorage.setItem("pranaveda_asana_favs", JSON.stringify(favoritesArray));
                 }
             } catch (e) {}
 
-            if (this.db && this.currentUser) {
+            if (this.db) {
                 try {
-                    await this.db.collection("users")
-                        .doc(this.currentUser.uid)
+                    this.db.collection("users")
+                        .doc(uid)
                         .set({
                             favorites: favoritesArray,
                             lastUpdated: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
@@ -428,7 +484,8 @@
            ONE-CLICK MIGRATION: LOCALSTORAGE -> FIRESTORE
            ========================================================================== */
         async migrateLocalDataToFirestore() {
-            if (!this.db || !this.currentUser) return;
+            if (!this.db) return;
+            const uid = (this.currentUser && this.currentUser.uid) ? this.currentUser.uid : this.getClientUid();
             try {
                 const localSessions = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("breathingSessions") || "[]") : [];
                 const localFavs = typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("pranaveda_asana_favs") || "[]") : [];
@@ -437,7 +494,7 @@
                 const batch = this.db.batch();
 
                 localSessions.slice(0, 50).forEach((s) => {
-                    const ref = this.db.collection("users").doc(this.currentUser.uid).collection("breathingSessions").doc();
+                    const ref = this.db.collection("users").doc(uid).collection("breathingSessions").doc();
                     batch.set(ref, {
                         pattern: s.pattern,
                         duration: s.duration,
@@ -455,7 +512,7 @@
                 });
 
                 if (localFavs.length > 0) {
-                    const userDoc = this.db.collection("users").doc(this.currentUser.uid);
+                    const userDoc = this.db.collection("users").doc(uid);
                     batch.set(userDoc, { favorites: localFavs }, { merge: true });
                 }
 
@@ -522,6 +579,40 @@
     // Export Singleton to Window
     if (typeof window !== "undefined") {
         window.PranaFirebase = new FirebaseSyncMaster();
+
+        // Built-in Notification Toast Helper
+        if (!window.showNotificationToast) {
+            window.showNotificationToast = function (msg) {
+                let toast = document.getElementById("pranavedaGlobalToast");
+                if (!toast) {
+                    toast = document.createElement("div");
+                    toast.id = "pranavedaGlobalToast";
+                    toast.style.position = "fixed";
+                    toast.style.bottom = "24px";
+                    toast.style.right = "24px";
+                    toast.style.background = "rgba(20, 32, 36, 0.95)";
+                    toast.style.color = "#26a5b8";
+                    toast.style.padding = "12px 20px";
+                    toast.style.borderRadius = "12px";
+                    toast.style.fontSize = "13.5px";
+                    toast.style.fontWeight = "600";
+                    toast.style.boxShadow = "0 8px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(38,165,184,0.3)";
+                    toast.style.zIndex = "999999";
+                    toast.style.transition = "all 0.3s ease";
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateY(20px)";
+                    document.body.appendChild(toast);
+                }
+                toast.innerHTML = msg;
+                toast.style.opacity = "1";
+                toast.style.transform = "translateY(0)";
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => {
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateY(20px)";
+                }, 3500);
+            };
+        }
 
         // Auto-init on DOMContentLoaded
         if (document.readyState === "loading") {

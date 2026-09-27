@@ -847,6 +847,32 @@ function pauseSession() {
 }
 
 function resetSession() {
+    const elapsed = totalSeconds - remainingTotal;
+    if (elapsed >= 20 && cycleCount > 0) {
+        const durationMins = Math.max(1, Math.round(elapsed / 60));
+        const partial = {
+            date: new Date().toISOString(),
+            duration: durationMins,
+            pattern: patternSelect.value,
+            cycles: cycleCount,
+            mindWanders: mindWanders,
+            rating: 5
+        };
+        const sessions = getSessions();
+        sessions.push(partial);
+        localStorage.setItem("breathingSessions", JSON.stringify(sessions));
+        if (window.PranaFirebase) {
+            window.PranaFirebase.saveSession({
+                pattern: getPatternDisplayName(partial.pattern || "4-6"),
+                duration: durationMins,
+                cycles: partial.cycles,
+                mindWanders: partial.mindWanders,
+                rating: 5,
+                type: "Pranayama"
+            });
+        }
+    }
+
     clearInterval(timer);
     timer = null;
     running = false;
@@ -896,13 +922,32 @@ function completeSession() {
         audio.playSingingBowl(528); // 528Hz Solfeggio frequency for completion
     }
 
+    const durationMins = Number(durationSelect.value) || 1;
     pendingSession = {
         date: new Date().toISOString(),
-        duration: Number(durationSelect.value),
+        duration: durationMins,
         pattern: patternSelect.value,
-        mindWanders,
-        rating: null
+        cycles: cycleCount || 0,
+        mindWanders: mindWanders || 0,
+        rating: 5
     };
+
+    // Auto-save to LocalStorage and Firebase immediately
+    const sessions = getSessions();
+    sessions.push(pendingSession);
+    localStorage.setItem("breathingSessions", JSON.stringify(sessions));
+    loadStats();
+
+    if (window.PranaFirebase) {
+        window.PranaFirebase.saveSession({
+            pattern: getPatternDisplayName(pendingSession.pattern || "4-6"),
+            duration: durationMins,
+            cycles: pendingSession.cycles,
+            mindWanders: pendingSession.mindWanders,
+            rating: 5,
+            type: "Pranayama"
+        });
+    }
 
     ratingModal.classList.add("show");
 }
@@ -979,7 +1024,11 @@ saveRatingBtn.addEventListener("click", () => {
     if (pendingSession) {
         pendingSession.rating = selectedRating || 5;
         const sessions = getSessions();
-        sessions.push(pendingSession);
+        if (sessions.length > 0 && sessions[sessions.length - 1].date === pendingSession.date) {
+            sessions[sessions.length - 1].rating = selectedRating || 5;
+        } else {
+            sessions.push(pendingSession);
+        }
         localStorage.setItem("breathingSessions", JSON.stringify(sessions));
         if (window.PranaFirebase) {
             window.PranaFirebase.saveSession({
@@ -987,7 +1036,7 @@ saveRatingBtn.addEventListener("click", () => {
                 duration: pendingSession.duration || 10,
                 cycles: pendingSession.cycles || 0,
                 mindWanders: pendingSession.mindWanders || 0,
-                rating: pendingSession.rating || 5,
+                rating: selectedRating || 5,
                 type: "Pranayama"
             });
         }
