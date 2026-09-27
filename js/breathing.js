@@ -1511,14 +1511,13 @@ window.deleteSession = function(index) {
 };
 
 if (refreshHistoryBtn) {
-    refreshHistoryBtn.addEventListener("click", () => {
-        loadStats();
-        if (window.PranaFirebase && window.PranaFirebase.db) {
-            const uid = window.PranaFirebase.currentUser ? window.PranaFirebase.currentUser.uid : window.PranaFirebase.getClientUid();
-            window.PranaFirebase.attachRealtimeListeners(uid);
+    refreshHistoryBtn.addEventListener("click", async () => {
+        if (window.PranaFirebase && typeof window.PranaFirebase.pullFromCloud === "function") {
+            await window.PranaFirebase.pullFromCloud();
         }
+        loadStats();
         if (typeof window.showNotificationToast === "function") {
-            window.showNotificationToast("🔄 History Refreshed");
+            window.showNotificationToast("🔄 History Refreshed from Cloud");
         }
     });
 }

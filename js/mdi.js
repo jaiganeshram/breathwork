@@ -151,7 +151,7 @@
                     this.droneGain.gain.setValueAtTime(this.droneGain.gain.value, now);
                     this.droneGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
                     setTimeout(() => {
-                        this.droneOscs.forEach(o => { try { o.stop(); } catch(e){} });
+                        this.droneOscs.forEach(o => { try { o.stop(); } catch (e) { } });
                         this.droneOscs = [];
                         this.droneGain = null;
                     }, 1050);
@@ -192,7 +192,7 @@
                     this.ambientNodes.pinkGain.gain.setValueAtTime(this.ambientNodes.pinkGain.gain.value, now);
                     this.ambientNodes.pinkGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
                     setTimeout(() => {
-                        try { this.ambientNodes.pinkSource.stop(); } catch(e){}
+                        try { this.ambientNodes.pinkSource.stop(); } catch (e) { }
                         this.ambientNodes.pinkSource = null;
                         this.ambientNodes.pinkGain = null;
                     }, 850);
@@ -472,7 +472,7 @@
     }
     function releaseWakeLock() {
         if (wakeLock) {
-            try { wakeLock.release(); } catch(e){}
+            try { wakeLock.release(); } catch (e) { }
             wakeLock = null;
         }
     }
@@ -484,7 +484,7 @@
                 else if (type === "exhale") navigator.vibrate([85]);
                 else if (type === "hold") navigator.vibrate([25, 40, 25]);
                 else navigator.vibrate([40]);
-            } catch (e) {}
+            } catch (e) { }
         }
     }
 
@@ -612,6 +612,7 @@
             quickBreathState.phaseTimeRemaining = pat.ratio[nextPhase];
 
             // Sound cue & haptic vibration for phase change
+
             if (nextPhase === 0) {
                 audio.playBell(528, 2.5, "bowl"); // Inhale
                 triggerHaptic("inhale");

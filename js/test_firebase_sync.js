@@ -82,6 +82,7 @@ const context = vm.createContext({
     JSON,
     Array,
     Set,
+    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: { sessions: [] } }) }),
     setInterval: () => 1,
     clearInterval: () => {}
 });
