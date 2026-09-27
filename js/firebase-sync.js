@@ -73,8 +73,9 @@
         /* ==========================================================================
            1. UNIVERSAL REST CLOUD SYNC (WORKS ON ALL MACHINES AUTOMATICALLY)
            ========================================================================== */
-        async pullFromCloud() {
+        async pullFromCloud(force = false) {
             if (typeof fetch !== "function" || !this.isOnline || this.isSyncing) return;
+            if (!force && Date.now() - this.lastSyncTime < 15000) return;
             this.isSyncing = true;
 
             try {
@@ -292,12 +293,12 @@
                 });
             }
 
-            // 4. Background polling every 10 seconds for seamless continuous cross-device sync
+            // 4. Periodic background sync with 60s cooldown (prevents API rate limits)
             setInterval(() => {
-                if (this.isOnline) {
+                if (this.isOnline && (Date.now() - this.lastSyncTime > 60000)) {
                     this.pullFromCloud();
                 }
-            }, 10000);
+            }, 60000);
 
             // 5. Firebase initialization in background (optional enhancement)
             this.initFirebase();

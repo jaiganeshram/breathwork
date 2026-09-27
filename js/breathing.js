@@ -926,42 +926,14 @@ function pauseSession() {
     if (endBtn) endBtn.disabled = false;
     audio.stopAmbient();
     releaseScreenWakeLock();
-
-    // Auto-save practice if at least 1 cycle or 6+ seconds
-    const elapsed = totalSeconds - remainingTotal;
-    if (elapsed >= 6 || cycleCount >= 1) {
-        const durationMins = Math.max(1, Math.round(elapsed / 60));
-        recordPranayamaSession({
-            pattern: patternSelect.value,
-            duration: durationMins,
-            cycles: cycleCount || 1,
-            mindWanders: mindWanders || 0,
-            rating: 5
-        });
-    }
 }
 
 function resetSession() {
-    const wasRunning = running;
-    const elapsed = totalSeconds - remainingTotal;
-
     releaseScreenWakeLock();
     clearInterval(timer);
     timer = null;
     running = false;
     audio.stopAmbient();
-
-    // If user was actively practicing and resets, auto-save the partial session so no effort is lost
-    if (wasRunning && (elapsed >= 6 || cycleCount >= 1)) {
-        const durationMins = Math.max(1, Math.round(elapsed / 60));
-        recordPranayamaSession({
-            pattern: patternSelect.value,
-            duration: durationMins,
-            cycles: cycleCount || 1,
-            mindWanders: mindWanders || 0,
-            rating: 5
-        });
-    }
 
     totalSeconds = Number(durationSelect.value) * 60;
     remainingTotal = totalSeconds;
