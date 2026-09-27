@@ -19,14 +19,15 @@
 (function () {
     "use strict";
 
-    // Target configuration for Firebase Project: breathwork-c5371
+    // Real production configuration for Firebase Project: breathwork-c5371
     const DEFAULT_CONFIG = {
-        apiKey: "AIzaSyDemoPlaceholderConfigKeyPranaVeda2026",
+        apiKey: "AIzaSyC8lAP_MhLMQLoKXttRhA6KnpU6ihdVq2M",
         authDomain: "breathwork-c5371.firebaseapp.com",
         projectId: "breathwork-c5371",
-        storageBucket: "breathwork-c5371.appspot.com",
-        messagingSenderId: "108108108108",
-        appId: "1:108108108108:web:breathworkc5371app"
+        storageBucket: "breathwork-c5371.firebasestorage.app",
+        messagingSenderId: "719227509437",
+        appId: "1:719227509437:web:aeae0e0179030b145bb5d4",
+        measurementId: "G-XWCJYPL1D6"
     };
 
     class FirebaseSyncMaster {
@@ -60,8 +61,12 @@
                 if (typeof localStorage !== "undefined") {
                     const stored = localStorage.getItem("pranaveda_firebase_config");
                     if (stored) {
-                        return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
+                        const parsed = JSON.parse(stored);
+                        if (parsed && parsed.apiKey && !parsed.apiKey.includes("Placeholder")) {
+                            return { ...DEFAULT_CONFIG, ...parsed };
+                        }
                     }
+                    localStorage.setItem("pranaveda_firebase_config", JSON.stringify(DEFAULT_CONFIG));
                 }
             } catch (e) {
                 console.warn("Config load fallback:", e);

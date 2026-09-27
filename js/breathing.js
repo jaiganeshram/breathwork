@@ -811,11 +811,49 @@ function tick() {
     }
 }
 
+/* ==========================================================================
+   SCREEN WAKE LOCK (PREVENTS MOBILE / LAPTOP SLEEP MODE DURING PRACTICE)
+   ========================================================================== */
+let screenWakeLock = null;
+
+async function requestScreenWakeLock() {
+    if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function') {
+        try {
+            screenWakeLock = await navigator.wakeLock.request('screen');
+            screenWakeLock.addEventListener('release', () => {
+                screenWakeLock = null;
+            });
+            console.log("🔆 Screen Wake Lock active: Device will not sleep during practice.");
+        } catch (err) {
+            console.warn("Wake Lock notice:", err.message);
+        }
+    }
+}
+
+function releaseScreenWakeLock() {
+    if (screenWakeLock) {
+        try {
+            screenWakeLock.release();
+        } catch (e) {}
+        screenWakeLock = null;
+        console.log("🌙 Screen Wake Lock released.");
+    }
+}
+
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', async () => {
+        if (running && document.visibilityState === 'visible') {
+            await requestScreenWakeLock();
+        }
+    });
+}
+
 function startSession() {
     if (running) return;
 
     audio.init();
     audio.startAmbient(ambientSelect.value);
+    requestScreenWakeLock();
 
     if (!phases.length) {
         phases = getPattern();
@@ -844,9 +882,11 @@ function pauseSession() {
     startBtn.disabled = false;
     pauseBtn.disabled = true;
     audio.stopAmbient();
+    releaseScreenWakeLock();
 }
 
 function resetSession() {
+    releaseScreenWakeLock();
     const elapsed = totalSeconds - remainingTotal;
     if (elapsed >= 20 && cycleCount > 0) {
         const durationMins = Math.max(1, Math.round(elapsed / 60));
