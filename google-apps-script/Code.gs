@@ -12,10 +12,11 @@
 
 const SECRET = 'change-me'; // must match `secret` in js/sheets-config.js
 const SHEET_NAME = 'Sessions';
+const SPREADSHEET_ID = '1i8Ra-ba9xs4TufW9QOK7f-jnVL5zRLakoIyUIM2IeKg';
 const HEADERS = ['id', 'date', 'pattern', 'duration', 'cycles', 'mindWanders', 'rating', 'clientDate', 'clientTime'];
 
 function getSheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
