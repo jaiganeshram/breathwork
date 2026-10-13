@@ -909,6 +909,10 @@ function recordPranayamaSession(data) {
     localStorage.setItem("breathingSessions", JSON.stringify(sessions.slice(0, 150)));
     loadStats();
 
+    if (window.PranaFirebase && typeof window.PranaFirebase.saveSession === "function") {
+        window.PranaFirebase.saveSession(sessionObj);
+    }
+
     return sessionObj;
 }
 window.recordPranayamaSession = recordPranayamaSession;
@@ -1476,25 +1480,35 @@ if (toggleAllGroupsBtn) {
 window.deleteDateGroup = function(dateKeyStr, title) {
     if (confirm(`Are you sure you want to delete all Pranayama sessions recorded on ${title}?`)) {
         const sessions = getSessions();
+        const removed = sessions.filter(s => (dateKey(s.date) || 'unknown') === dateKeyStr);
         const updated = sessions.filter(s => (dateKey(s.date) || 'unknown') !== dateKeyStr);
         localStorage.setItem("breathingSessions", JSON.stringify(updated));
         collapsedDateGroups.delete(dateKeyStr);
         loadStats();
+        if (window.PranaFirebase && typeof window.PranaFirebase.deleteSessionsFromCloud === "function") {
+            window.PranaFirebase.deleteSessionsFromCloud(removed.map(s => s.date).filter(Boolean));
+        }
     }
 };
 
 window.deleteSession = function(index) {
     const sessions = getSessions();
     if (index >= 0 && index < sessions.length) {
-        sessions.splice(index, 1);
+        const [removed] = sessions.splice(index, 1);
         localStorage.setItem("breathingSessions", JSON.stringify(sessions));
         loadStats();
+        if (removed && window.PranaFirebase && typeof window.PranaFirebase.deleteSessionFromCloud === "function") {
+            window.PranaFirebase.deleteSessionFromCloud(removed.date);
+        }
     }
 };
 
 if (refreshHistoryBtn) {
     refreshHistoryBtn.addEventListener("click", () => {
         loadStats();
+        if (window.PranaFirebase && typeof window.PranaFirebase.pullFromCloud === "function") {
+            window.PranaFirebase.pullFromCloud();
+        }
         if (typeof window.showNotificationToast === "function") {
             window.showNotificationToast("🔄 History Refreshed");
         }
@@ -1506,6 +1520,9 @@ clearHistoryBtn.addEventListener("click", () => {
         localStorage.removeItem("breathingSessions");
         collapsedDateGroups.clear();
         loadStats();
+        if (window.PranaFirebase && typeof window.PranaFirebase.clearAllFromCloud === "function") {
+            window.PranaFirebase.clearAllFromCloud();
+        }
     }
 });
 
