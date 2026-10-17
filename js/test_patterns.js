@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const htmlPath = path.join(__dirname, '..', 'Breathing_Exercise.html');
+const htmlPath = path.join(__dirname, '..', 'index.html');
 const content = fs.readFileSync(htmlPath, 'utf8');
 
 const regex = /<select id="pattern">([\s\S]*?)<\/select>/;

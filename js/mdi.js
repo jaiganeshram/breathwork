@@ -1146,7 +1146,7 @@
         "pranayama": {
             id: "pranayama",
             title: "🌬️ Pranayama & Breathwork Studio",
-            url: "Breathing_Exercise.html",
+            url: "index.html",
             icon: "🌬️"
         },
         "asanas": {
