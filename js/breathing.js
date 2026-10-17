@@ -1130,6 +1130,8 @@ saveRatingBtn.addEventListener("click", () => {
    DATA, STATS, ACHIEVEMENTS & DATE-WISE SESSION HISTORY
    ========================================================================== */
 let collapsedDateGroups = new Set();
+let initializedDateKeys = new Set();
+let lastInitializedDate = '';
 
 function getSessions() {
     return JSON.parse(localStorage.getItem("breathingSessions") || "[]");
@@ -1317,10 +1319,30 @@ function loadStats() {
         return b.localeCompare(a);
     });
 
+    const todayKey = dateKey(new Date());
+
+    // If day changed (e.g. past midnight or new calendar day), reset initialized state
+    if (lastInitializedDate !== todayKey) {
+        initializedDateKeys.clear();
+        collapsedDateGroups.clear();
+        lastInitializedDate = todayKey;
+    }
+
+    // Default collapse state: only current day (today) is opened by default.
+    // Past/other days are collapsed unless user has already toggled them.
+    sortedKeys.forEach(k => {
+        if (!initializedDateKeys.has(k)) {
+            initializedDateKeys.add(k);
+            if (k !== todayKey) {
+                collapsedDateGroups.add(k);
+            }
+        }
+    });
+
     // Update toggle all button text
     if (toggleAllGroupsBtn) {
-        const allCollapsed = sortedKeys.length > 0 && sortedKeys.every(k => collapsedDateGroups.has(k));
-        toggleAllGroupsBtn.innerHTML = allCollapsed ? "⮞ Expand All" : "⮟ Collapse All";
+        const allExpanded = sortedKeys.length > 0 && sortedKeys.every(k => !collapsedDateGroups.has(k));
+        toggleAllGroupsBtn.innerHTML = allExpanded ? "⮟ Collapse All" : "⮞ Expand All";
     }
 
     // Build Date Groups HTML
@@ -1454,8 +1476,8 @@ window.toggleDateGroup = function(key) {
     const sessions = getSessions();
     const allKeys = [...new Set(sessions.map(s => dateKey(s.date)).filter(Boolean))];
     if (toggleAllGroupsBtn && allKeys.length) {
-        const allCollapsed = allKeys.every(k => collapsedDateGroups.has(k));
-        toggleAllGroupsBtn.innerHTML = allCollapsed ? "⮞ Expand All" : "⮟ Collapse All";
+        const allExpanded = allKeys.every(k => !collapsedDateGroups.has(k));
+        toggleAllGroupsBtn.innerHTML = allExpanded ? "⮟ Collapse All" : "⮞ Expand All";
     }
 };
 
@@ -1463,11 +1485,11 @@ function toggleAllDateGroups() {
     const sessions = getSessions();
     const allKeys = [...new Set(sessions.map(s => dateKey(s.date)).filter(Boolean))];
     if (!allKeys.length) return;
-    const allCollapsed = allKeys.every(k => collapsedDateGroups.has(k));
-    if (allCollapsed) {
-        collapsedDateGroups.clear();
-    } else {
+    const allExpanded = allKeys.every(k => !collapsedDateGroups.has(k));
+    if (allExpanded) {
         allKeys.forEach(k => collapsedDateGroups.add(k));
+    } else {
+        collapsedDateGroups.clear();
     }
     loadStats();
 }
@@ -1484,6 +1506,7 @@ window.deleteDateGroup = function(dateKeyStr, title) {
         const updated = sessions.filter(s => (dateKey(s.date) || 'unknown') !== dateKeyStr);
         localStorage.setItem("breathingSessions", JSON.stringify(updated));
         collapsedDateGroups.delete(dateKeyStr);
+        initializedDateKeys.delete(dateKeyStr);
         loadStats();
         if (window.PranaFirebase && typeof window.PranaFirebase.deleteSessionsFromCloud === "function") {
             window.PranaFirebase.deleteSessionsFromCloud(removed.map(s => s.date).filter(Boolean));
@@ -1519,6 +1542,8 @@ clearHistoryBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to clear your entire Pranayama history?")) {
         localStorage.removeItem("breathingSessions");
         collapsedDateGroups.clear();
+        initializedDateKeys.clear();
+        lastInitializedDate = '';
         loadStats();
         if (window.PranaFirebase && typeof window.PranaFirebase.clearAllFromCloud === "function") {
             window.PranaFirebase.clearAllFromCloud();
